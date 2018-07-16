@@ -66,7 +66,7 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
                         margin: EdgeInsets.only(top: 50.0),
                         child: new RaisedButton(
                             color: Colors.blue,
-                            onPressed: this._handleLogin,
+                            onPressed: () => this._handleLogin(context),
                             child: new Text(
                                 this.getI18nValue(context, "login"),
                                 style: new TextStyle(
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
     }
 
 
-    void _handleLogin() {
-
+    void _handleLogin(BuildContext context) {
+        Navigator.pushReplacementNamed(context, "infoList");
     }
 }

@@ -5,6 +5,7 @@ import "package:flutter/rendering.dart";
 import "package:info_manager/i18n/info_manager_localizations.dart" show InfoManagerLocalizationsDelegate;
 
 import "package:info_manager/views/login.dart";
+import "package:info_manager/views/info_list.dart";
 
 void main() {
     runApp(new InfoManager());
@@ -14,7 +15,7 @@ class InfoManager extends StatelessWidget {
     @override
     Widget build(BuildContext context) {
         return new MaterialApp(
-            title: "12",
+            title: "InfoManager",
             theme: new ThemeData(
                 primaryColor: Colors.blue
             ),
@@ -28,6 +29,9 @@ class InfoManager extends StatelessWidget {
                 const Locale("en", ""),
                 const Locale("zh", "")
             ],
+            routes: {
+                "infoList": (BuildContext context) => new InfoListPage()
+            },
         );
     }
 }

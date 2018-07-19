@@ -4,5 +4,18 @@ const Map<String, String> EN = {
     "password": "password",
     "please_input_password": "Please input password",
     "info_list": "Info List",
-    "category": "category"
+    "category": "category",
+    "please_select_category": "Please select category",
+    "edit_info": "Edit Info",
+    "create_info": "Add Info",
+    "title": "title",
+    "please_input_title": "Please input title",
+    "property": "Property",
+    "please_input_property": "Please input property",
+    "content": "content",
+    "please_input_content": "Please input content",
+    "hide": "hide",
+    "title_can_not_empty": "title can not empty",
+    "property_can_not_empty": "property can not empty",
+    "content_can_not_empty": "content can not empty"
 };

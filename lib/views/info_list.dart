@@ -1,6 +1,9 @@
 import "package:flutter/material.dart";
+import "package:flutter_redux/flutter_redux.dart";
 
+import "package:info_manager/store/app_state.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
+import "package:info_manager/views/info_edit.dart";
 
 class InfoListPage extends StatefulWidget {
     _InfoListPageState createState() => new _InfoListPageState();
@@ -28,13 +31,20 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
     }
 
     Widget buildBody(BuildContext context) {
-        return new Center(
-            child: new Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                    new Text("dd")
-                ],
-            )
+        return new StoreConnector<AppState, String>(
+            converter: (store) {
+                return store.state.infos[0].title;
+            },
+
+            builder: (context, count) {
+                return new Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                        new Text(count)
+                    ],
+                );
+
+            },
         );
     }
 
@@ -98,9 +108,20 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
 
     Widget buildAddBtn(BuildContext context) {
         return new FloatingActionButton(
-            onPressed: null,
+            onPressed: () => this.showEditPage(context),
             child: new Icon(Icons.add),
         );
+    }
+
+    void showEditPage(context) {
+        Navigator.of(context).push(
+            new MaterialPageRoute(
+                builder: (BuildContext context) {
+                    return new InfoEditPage("create");
+                }
+            )
+        );
+        
     }
 
     @override

@@ -82,6 +82,6 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
 
 
     void _handleLogin(BuildContext context) {
-        Navigator.pushReplacementNamed(context, "infoList");
+        Navigator.pushReplacementNamed(context, "infoListView");
     }
 }

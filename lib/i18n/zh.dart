@@ -4,5 +4,18 @@ const Map<String, String> ZH = {
     "password": "密码",
     "please_input_password": "请输入密码",
     "info_list": "信息",
-    "category": "分类"
+    "category": "分类",
+    "please_select_category": "请选择分类",
+    "edit_info": "编辑信息",
+    "create_info": "添加信息",
+    "title": "标题",
+    "please_input_title": "请输入标题",
+    "property": "属性",
+    "please_input_property": "请输入属性名",
+    "content": "内容",
+    "please_input_content": "请输入内容",
+    "hide": "隐藏",
+    "title_can_not_empty": "标题不能为空",
+    "property_can_not_empty": "属性名不能为空",
+    "content_can_not_empty": "内容不能为空"
 };

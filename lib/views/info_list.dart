@@ -18,6 +18,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
         super.initState();
     }
 
+
     @override
     Widget build(BuildContext context) {
         return new Scaffold(

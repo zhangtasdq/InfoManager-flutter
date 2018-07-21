@@ -8,6 +8,7 @@ import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_reducer.dart";
 
 import "package:info_manager/i18n/info_manager_localizations.dart" show InfoManagerLocalizationsDelegate;
+import "package:info_manager/service/app_service.dart";
 
 import "package:info_manager/views/login.dart";
 import "package:info_manager/views/info_list.dart";
@@ -17,10 +18,17 @@ void main() {
 }
 
 class InfoManager extends StatelessWidget {
-    final store = new Store<AppState>(
-        appReducer,
-        initialState: new AppState()
-    );
+    bool previousInitState = false;
+    Store<AppState> store;
+
+    InfoManager() {
+        store = new Store<AppState>(
+            appReducer,
+            initialState: new AppState(),
+        );
+        store.onChange.listen(this.handleStateChange);
+    }
+
 
     @override
     Widget build(BuildContext context) {
@@ -46,5 +54,23 @@ class InfoManager extends StatelessWidget {
                 },
             )
         );
+    }
+
+    void handleStateChange(AppState state) async {
+        if (this.shouldSaveAppState(state)) {
+            await AppService.saveAppStateData(state);
+        }
+    }
+
+    bool shouldSaveAppState(AppState state) {
+        if (!state.isInit) {
+            return false;
+        }
+
+        if (!previousInitState) {
+            previousInitState = true;
+            return false;
+        }
+        return true;
     }
 }

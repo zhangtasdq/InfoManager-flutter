@@ -23,4 +23,10 @@ class FileService {
 
         return file.readAsString();
     }
+
+    static Future<Null> saveFileContent(String content) async {
+        File file = await _getLocalFile();
+
+        await file.writeAsString(content);
+    }
 }

@@ -1,11 +1,15 @@
+import "dart:async";
 import "package:flutter/material.dart";
+import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
+import "package:fluttertoast/fluttertoast.dart";
 
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_actions.dart";
 
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/service/user_service.dart";
+import "package:info_manager/service/app_service.dart";
 
 typedef void SetPasswordActionType(String password);
 
@@ -69,7 +73,9 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
                 child: new Column(
                     children: <Widget>[
                         TextFormField(
+                            obscureText: true,
                             decoration: new InputDecoration(
+
                                 labelText: this.getI18nValue(context, "password"),
                                 hintText: this.getI18nValue(context, "please_input_password"),
                             ),
@@ -123,15 +129,19 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
 
             if (loginSuccess) {
                 updatePasswordAction(this.currentPassword);
+
+
+                Store<AppState> store = StoreProvider.of<AppState>(context);
+                await AppService.loadAppStateData(store);
+
+
+                new Future.delayed(new Duration(milliseconds: 500), () {
+                    store.dispatch(new SetIsInitAction(true));
+                });
                 Navigator.pushReplacementNamed(context, "infoListView");
             } else {
-                new SnackBar(
-                    content: new Text(
-                        this.getI18nValue(context, "password_is_error"),
-                        style: new TextStyle(
-                            color: Colors.redAccent
-                        ),
-                    )
+                Fluttertoast.showToast(
+                    msg: this.getI18nValue(context, "password_is_error")
                 );
             }
         }

@@ -122,6 +122,17 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                                 hintText: this.getI18nValue(context, "please_select_category"),
                             ),
                         ),
+                        new Expanded(
+                            child: new DropdownButton(
+                                items: <String>['A', 'B', 'C', 'D'].map((String value) {
+                                    return new DropdownMenuItem<String>(
+                                        value: value,
+                                        child: new Text(value),
+                                    );
+                                }).toList(),
+                                onChanged: (_) {},
+                            )
+                        ),
                     ],
                 ),
             ),
@@ -220,7 +231,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
     void setInitData() {
         this._currentInfo = new Info(Uid.generateUid(), "", "", []);
     }
-    
+
     void handleClickHideCheckbox(InfoDetail item, bool checked) {
         setState(() {
             item.setIsHide(checked);

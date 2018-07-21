@@ -1,22 +1,19 @@
 import "dart:async";
 
 import "package:flutter_string_encryption/flutter_string_encryption.dart";
-import "package:info_manager/configure/app_configure.dart";
 import "package:info_manager/service/file_service.dart";
-import "package:info_manager/util/password_padding.dart";
+import "package:info_manager/service/encrypt_service.dart";
 
 class UserService {
     static Future<bool> login(String password) async {
         bool isFileExist = await FileService.isFileExist();
 
         if (isFileExist) {
-            String content = await FileService.getFileContent(),
-                   paddingPassword = passwordPadding(password, APP_CONFIGURE["PASSWORD_LENGTH"]);
+            String content = await FileService.getFileContent();
 
             try {
-                final cryptor = new PlatformStringCryptor();
-
-                cryptor.decrypt(content, paddingPassword);
+                await EncryptService.decryptStr(password, content);
+                return true;
             } on MacMismatchException {
                 return false;
             }

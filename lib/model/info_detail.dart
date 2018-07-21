@@ -6,6 +6,12 @@ class InfoDetail {
 
     InfoDetail(this.id, this.propertyName, this.propertyValue, this.hide);
 
+    InfoDetail.fromJson(Map<String, dynamic> json) {
+        id = json["id"];
+        propertyName = json["propertyName"];
+        propertyValue = json["propertyValue"];
+    }
+
     bool isHide() {
         return this.hide == null ? false : this.hide;
     }
@@ -14,8 +20,20 @@ class InfoDetail {
         this.hide = hide;
     }
 
+    Map<String, dynamic> getSaveData() {
+        return this.toJson();
+    }
+
     String toString() {
-        return '{"id": $id, "propertyName": $propertyName, "propertyValue": $propertyValue, "isHide": $hide}';
+        return '{"id": "$id", "propertyName": "$propertyName", "propertyValue": "$propertyValue", "isHide": $hide}';
+    }
+
+    Map<String, dynamic> toJson() {
+        return {
+            "id": id,
+            "propertyName": propertyName,
+            "propertyValue": propertyValue
+        };
     }
 
     void setPropertyName(String name) {

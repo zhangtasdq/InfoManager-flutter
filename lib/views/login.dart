@@ -1,6 +1,13 @@
 import "package:flutter/material.dart";
+import "package:flutter_redux/flutter_redux.dart";
+
+import "package:info_manager/store/app_state.dart";
+import "package:info_manager/store/app_actions.dart";
 
 import "package:info_manager/mixins/i18n_mixin.dart";
+import "package:info_manager/service/user_service.dart";
+
+typedef void SetPasswordActionType(String password);
 
 class LoginPage extends StatefulWidget {
     @override
@@ -8,6 +15,9 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> with I18nMixin {
+    String currentPassword;
+    GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+
     @override
     Widget build(BuildContext context) {
         return new Container(
@@ -54,34 +64,76 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
     Widget _buildBody(BuildContext context) {
         return new Container(
             padding: EdgeInsets.fromLTRB(16.0, 20.0, 15.0, 40.0),
-            child: new Column(
-                children: <Widget>[
-                    new TextField(
-                        decoration: new InputDecoration(
-                            labelText: this.getI18nValue(context, "password"),
-                            hintText: this.getI18nValue(context, "please_input_password"),
-                        ),
-                    ),
-                    new Container(
-                        margin: EdgeInsets.only(top: 50.0),
-                        child: new RaisedButton(
-                            color: Colors.blue,
-                            onPressed: () => this._handleLogin(context),
-                            child: new Text(
-                                this.getI18nValue(context, "login"),
-                                style: new TextStyle(
-                                    color: Colors.white
-                                )
+            child: new Form(
+                key: _formKey,
+                child: new Column(
+                    children: <Widget>[
+                        TextFormField(
+                            decoration: new InputDecoration(
+                                labelText: this.getI18nValue(context, "password"),
+                                hintText: this.getI18nValue(context, "please_input_password"),
                             ),
-                        )
-                    ),
-                ],
+                            validator: (value) {
+                                if (value.isEmpty) {
+                                    return this.getI18nValue(context, "please_input_password");
+                                }
+                            },
+
+                            onSaved: (value) {
+                                this.currentPassword = value;
+                            },
+
+                        ),
+                        new Container(
+                            margin: EdgeInsets.only(top: 50.0),
+                            child: new StoreConnector<AppState, SetPasswordActionType>(
+                                converter: (store) {
+                                    return (String password) {
+                                        SetPasswordAction action = new SetPasswordAction(password);
+
+                                        store.dispatch(action);
+                                    };
+                                },
+                                builder: (context, updatePasswordAction) {
+                                    return new RaisedButton(
+                                        color: Colors.blue,
+                                        onPressed: () => this._handleLogin(context, updatePasswordAction),
+                                        child: new Text(
+                                            this.getI18nValue(context, "login"),
+                                            style: new TextStyle(
+                                                color: Colors.white
+                                            )
+                                        ),
+                                    );
+                                },
+                            ),
+                        ),
+                    ],
+                ),
             ),
         );
     }
 
 
-    void _handleLogin(BuildContext context) {
-        Navigator.pushReplacementNamed(context, "infoListView");
+    void _handleLogin(BuildContext context, SetPasswordActionType updatePasswordAction) async {
+        if (this._formKey.currentState.validate()) {
+            this._formKey.currentState.save();
+
+            bool loginSuccess = await UserService.login(this.currentPassword);
+
+            if (loginSuccess) {
+                updatePasswordAction(this.currentPassword);
+                Navigator.pushReplacementNamed(context, "infoListView");
+            } else {
+                new SnackBar(
+                    content: new Text(
+                        this.getI18nValue(context, "password_is_error"),
+                        style: new TextStyle(
+                            color: Colors.redAccent
+                        ),
+                    )
+                );
+            }
+        }
     }
 }

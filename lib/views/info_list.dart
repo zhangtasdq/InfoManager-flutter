@@ -1,6 +1,7 @@
 import "package:flutter/material.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
+import "package:info_manager/model/info.dart";
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/views/info_edit.dart";
@@ -31,16 +32,20 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
     }
 
     Widget buildBody(BuildContext context) {
-        return new StoreConnector<AppState, String>(
+        return new StoreConnector<AppState, List<Info>>(
             converter: (store) {
-                return store.state.infos[0].title;
+                return store.state.infos;
             },
 
-            builder: (context, count) {
+            builder: (context, infos) {
+                if (infos.length == 0) {
+                    return new Center(
+                        child: new Text(this.getI18nValue(context, "info_is_empty")),
+                    );
+                }
                 return new Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                        new Text(count)
                     ],
                 );
 

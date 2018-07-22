@@ -29,5 +29,7 @@ const Map<String, String> ZH = {
     "select_category": "选择分类",
     "category_can_not_empty": "分类不能为空",
     "save_success": "保存成功",
-    "detail_is_empty": "详情为空"
+    "detail_is_empty": "详情为空",
+    "delete_info": "删除信息",
+    "is_delete_info": "确认删除信息?"
 };

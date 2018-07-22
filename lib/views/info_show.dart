@@ -7,6 +7,7 @@ import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
 import "package:info_manager/model/info_detail.dart";
+import "package:info_manager/views/info_edit.dart";
 
 class InfoShowPage extends StatefulWidget {
     String infoId;
@@ -79,7 +80,7 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
                     child: new FloatingActionButton(
                         child: new Icon(Icons.edit),
                         onPressed: () {
-                            print('FAB tapped!');
+                            this.handleTabEditInfo(context, info);
                         },
                         backgroundColor: Colors.lightBlue,
                     ),
@@ -138,7 +139,6 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
     }
 
     String getDetailItemValue(InfoDetail item) {
-        item.hide = true;
         if (item.hide != true) {
             return item.propertyValue;
         }
@@ -160,6 +160,7 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
                 return categories[i];
             }
         }
+        return null;
     }
 
     Info getCurrentInfo(BuildContext context) {
@@ -171,6 +172,7 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
                 return infos[i];
             }
         }
+        return null;
     }
 
     Store<AppState> getStore(BuildContext context) {
@@ -189,5 +191,13 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
         }
     }
 
-
+    void handleTabEditInfo(BuildContext context, Info info) {
+        Navigator.of(context).push(
+            new MaterialPageRoute(
+                builder: (BuildContext context) {
+                    return new InfoEditPage("edit", info.id);
+                }
+            )
+        );
+    }
 }

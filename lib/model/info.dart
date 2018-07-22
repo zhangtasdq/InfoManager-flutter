@@ -23,6 +23,12 @@ class Info {
         details = infoDetails;
     }
 
+    Info clone() {
+        List<InfoDetail> cloneDetails = this.details.map((InfoDetail item) => item.clone()).toList();
+
+        return new Info(id, title, categoryId, cloneDetails);
+    }
+
 
     bool isExistDetailItemByIndex(int index) {
         return this.details.length > index;

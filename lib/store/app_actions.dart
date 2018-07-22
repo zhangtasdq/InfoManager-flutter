@@ -13,6 +13,17 @@ class AddInfoAction {
     AddInfoAction(this.info);
 }
 
+class UpdateInfoAction {
+    final Info info;
+
+    UpdateInfoAction(this.info);
+}
+
+class DeleteInfoAction {
+    final Info info;
+    DeleteInfoAction(this.info);
+}
+
 
 class SetPasswordAction {
     final String password;

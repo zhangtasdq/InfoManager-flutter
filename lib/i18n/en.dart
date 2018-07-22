@@ -29,5 +29,7 @@ const Map<String, String> EN = {
     "select_category": "Select category",
     "category_can_not_empty": "Category can not empty",
     "save_success": "Save Success",
-    "detail_is_empty": "detail is empty"
+    "detail_is_empty": "detail is empty",
+    "delete_info": "Delete info",
+    "is_delete_info": "Confirm delete info?"
 };

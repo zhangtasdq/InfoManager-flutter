@@ -12,6 +12,10 @@ class InfoDetail {
         propertyValue = json["propertyValue"];
     }
 
+    InfoDetail clone() {
+        return new InfoDetail(id, propertyName, propertyValue, hide);
+    }
+
     bool isHide() {
         return this.hide == null ? false : this.hide;
     }
@@ -32,7 +36,8 @@ class InfoDetail {
         return {
             "id": id,
             "propertyName": propertyName,
-            "propertyValue": propertyValue
+            "propertyValue": propertyValue,
+            "hide": hide
         };
     }
 

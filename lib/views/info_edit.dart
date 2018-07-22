@@ -17,24 +17,30 @@ typedef void AddCategoryActionType(Category category);
 
 class InfoEditPage extends StatefulWidget {
     final String viewAction;
+    final String editInfoId;
 
-    InfoEditPage(this.viewAction);
+    InfoEditPage(this.viewAction, [this.editInfoId]);
 
     @override
-    _InfoEditPageState createState() => new _InfoEditPageState(this.viewAction);
+    _InfoEditPageState createState() => new _InfoEditPageState(this.viewAction, this.editInfoId);
 }
 
 class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
+    bool _isInit = false;
     String _viewAction;
+    String _editInfoId;
     Info _currentInfo;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
-    _InfoEditPageState(this._viewAction) {
-        this.setInitData();
-    }
+    _InfoEditPageState(this._viewAction, [this._editInfoId]);
 
     @override
     Widget build(BuildContext context) {
+        if (this._isInit == false) {
+            this.setInitData(context);
+            this._isInit = true;
+        }
+
         return new Scaffold(
             appBar: this.buildHeader(context),
             body: this.buildBody(context)
@@ -56,7 +62,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                         Icons.delete,
                         color: Colors.white
                     ),
-                    onPressed: this.handleClickDelete
+                    onPressed: () => this.handleClickDelete(context)
                 )
             );
         }
@@ -123,6 +129,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                             onSaved: (value) {
                                 this._currentInfo.setTitle(value);
                             },
+                            initialValue: this._currentInfo.title,
                         ),
                         new StoreConnector<AppState, List<Category>>(
                             converter: (store) {
@@ -172,6 +179,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                             onSaved: (value) {
                                 item.setPropertyName(value);
                             },
+                            initialValue: item.propertyName,
 
                         ),
 
@@ -191,6 +199,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                                         onSaved: (value) {
                                             item.setPropertyValue(value);
                                         },
+                                        initialValue: item.propertyValue,
                                     ),
                                 ),
                                 new Padding(
@@ -239,8 +248,12 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
         return this._viewAction == "edit";
     }
 
-    void setInitData() {
-        this._currentInfo = new Info(Uid.generateUid(), "", "", []);
+    void setInitData(BuildContext context) {
+        if (this.isEdit()) {
+            this._currentInfo = this.getCurrentInfo(context).clone();
+        } else {
+            this._currentInfo = new Info(Uid.generateUid(), "", "", []);
+        }
     }
 
     void handleSelectCategory(BuildContext context, Category category) {
@@ -341,23 +354,73 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
             _formKey.currentState.save();
 
             Store<AppState> store = StoreProvider.of<AppState>(context);
-            AddInfoAction action;
+            dynamic action;
 
             if (this.isEdit()) {
-
+                action = new UpdateInfoAction(this._currentInfo);
             } else {
                 action = new AddInfoAction(this._currentInfo);
             }
             store.dispatch(action);
 
-            new Future.delayed(new Duration(milliseconds: 1500), () {
+            new Future.delayed(new Duration(milliseconds: 1200), () {
                 Navigator.pop(context);
-
             });
         }
     }
 
-    void handleClickDelete() {
-
+    void handleClickDelete(BuildContext context) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return new AlertDialog(
+                    title: new Text(this.getI18nValue(context, "delete_info")),
+                    content: new Text(this.getI18nValue(context, "is_delete_info")),
+                    actions: <Widget>[
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "cancel")),
+                            onPressed: () => Navigator.of(context).pop()
+                        ),
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "confirm")),
+                            onPressed: () {
+                                Navigator.of(context).pop();
+                                this.executeDeleteInfo(context);
+                            }
+                        )
+                    ],
+                );
+            }
+        );
     }
+
+    void executeDeleteInfo(BuildContext context) {
+        Store<AppState> store = this.getStore(context);
+
+        DeleteInfoAction action = new DeleteInfoAction(this._currentInfo);
+
+        store.dispatch(action);
+
+        new Future.delayed(new Duration(milliseconds: 1200), () {
+            Navigator.of(context).popUntil(ModalRoute.withName("infoListView"));
+        });
+    }
+
+    Info getCurrentInfo(BuildContext context) {
+        Store<AppState> store = this.getStore(context);
+        List<Info> infos = store.state.infos;
+
+        for (int i = 0, j = infos.length; i < j; ++i) {
+            if (infos[i].id == this._editInfoId) {
+                return infos[i];
+            }
+        }
+        return null;
+    }
+
+    Store<AppState> getStore(BuildContext context) {
+        return StoreProvider.of<AppState>(context);
+    }
+
+
 }

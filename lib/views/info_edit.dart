@@ -206,7 +206,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                                 ),
                                 new Padding(
                                     padding: EdgeInsets.only(top: 35.0),
-                                    child: new Text("hide")
+                                    child: new Text(this.getI18nValue(context, "hide"))
                                 )
                             ],
                         )

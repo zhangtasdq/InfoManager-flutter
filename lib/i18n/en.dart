@@ -31,5 +31,5 @@ const Map<String, String> EN = {
     "save_success": "Save Success",
     "detail_is_empty": "detail is empty",
     "delete_info": "Delete info",
-    "is_delete_info": "Confirm delete info?"
+    "is_delete_info": "Confirm delete info?",
 };

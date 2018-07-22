@@ -47,11 +47,6 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
         );
     }
 
-    @override
-    void dispose() {
-        super.dispose();
-    }
-
     Widget buildHeader(BuildContext context) {
         List<Widget> actions = new List();
 
@@ -384,7 +379,6 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                         new RaisedButton(
                             child: new Text(this.getI18nValue(context, "confirm")),
                             onPressed: () {
-                                Navigator.of(context).pop();
                                 this.executeDeleteInfo(context);
                             }
                         )
@@ -401,8 +395,8 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
 
         store.dispatch(action);
 
-        new Future.delayed(new Duration(milliseconds: 1200), () {
-            Navigator.of(context).popUntil(ModalRoute.withName("infoListView"));
+        new Future.delayed(new Duration(milliseconds: 1000), () {
+            Navigator.of(context).pushNamedAndRemoveUntil("infoListView", (Route<dynamic> route) => false);
         });
     }
 

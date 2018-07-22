@@ -12,14 +12,6 @@ class InfoListPage extends StatefulWidget {
 }
 
 class _InfoListPageState extends State<InfoListPage> with I18nMixin {
-
-    @override
-    void initState() {
-        // TODO: implement initState
-        super.initState();
-    }
-
-
     @override
     Widget build(BuildContext context) {
         return new Scaffold(
@@ -146,11 +138,5 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
             )
         );
 
-    }
-
-    @override
-    void dispose() {
-        // TODO: implement dispose
-        super.dispose();
     }
 }

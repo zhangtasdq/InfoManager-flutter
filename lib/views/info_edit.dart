@@ -1,11 +1,19 @@
+import "dart:async";
 import "package:flutter/material.dart";
+import "package:redux/redux.dart";
+import "package:flutter_redux/flutter_redux.dart";
+import "package:fluttertoast/fluttertoast.dart";
 
+import "package:info_manager/store/app_state.dart";
+import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/util/uid.dart";
-
+import "package:info_manager/components/select.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
 import "package:info_manager/model/info_detail.dart";
+
+typedef void AddCategoryActionType(Category category);
 
 class InfoEditPage extends StatefulWidget {
     final String viewAction;
@@ -59,7 +67,7 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                     Icons.save,
                     color: Colors.white
                 ),
-                onPressed: this.handleClickSave
+                onPressed: () => this.handleClickSave(context)
             )
         );
 
@@ -116,22 +124,25 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
                                 this._currentInfo.setTitle(value);
                             },
                         ),
-                        new TextField(
-                            decoration: new InputDecoration(
-                                labelText: this.getI18nValue(context, "category"),
-                                hintText: this.getI18nValue(context, "please_select_category"),
-                            ),
-                        ),
-                        new Expanded(
-                            child: new DropdownButton(
-                                items: <String>['A', 'B', 'C', 'D'].map((String value) {
-                                    return new DropdownMenuItem<String>(
-                                        value: value,
-                                        child: new Text(value),
-                                    );
-                                }).toList(),
-                                onChanged: (_) {},
-                            )
+                        new StoreConnector<AppState, List<Category>>(
+                            converter: (store) {
+                                return store.state.categories;
+                            },
+                            builder: (context, categories) {
+                                return new Select(
+                                    label: this.getI18nValue(context, "category"),
+                                    datas: categories,
+                                    onPress: (String action, dynamic data) {
+                                        if (action == "checked") {
+                                            this.handleSelectCategory(context, data);
+                                        } else if (action == "add") {
+                                            this.handleCreateCategory(context);
+
+                                        }
+                                    },
+                                    checkedItem: this._currentInfo.categoryId,
+                                );
+                            },
                         ),
                     ],
                 ),
@@ -232,6 +243,80 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
         this._currentInfo = new Info(Uid.generateUid(), "", "", []);
     }
 
+    void handleSelectCategory(BuildContext context, Category category) {
+        setState(() {
+            this._currentInfo.categoryId = category.id;
+        });
+        Navigator.of(context).pop();
+    }
+
+    void handleCreateCategory(BuildContext context) {
+        GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+        String categoryName = "";
+
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return new AlertDialog(
+                    content: new Form(
+                        key: _formKey,
+                        child: new TextFormField(
+                            decoration: new InputDecoration(
+                                labelText: this.getI18nValue(context, "category_name"),
+                                hintText: this.getI18nValue(context, "please_input_category_name")
+                            ),
+                            validator: (value) {
+                                if (value.isEmpty) {
+                                    return this.getI18nValue(context, "please_input_category_name");
+                                }
+                            },
+
+                            onSaved: (value) {
+                                categoryName = value;
+                            },
+                        )
+                    ),
+                    actions: <Widget>[
+                        new RaisedButton(
+                            onPressed: () {
+                                Navigator.of(context).pop();
+                            },
+                            child: new Text(
+                                this.getI18nValue(context, "cancel")
+                            ),
+                        ),
+                        new StoreConnector<AppState, AddCategoryActionType>(
+                            converter: (store) {
+                                return (Category category) {
+                                    store.dispatch(new AddCategoryAction(category));
+                                };
+                            },
+                            builder: (context, addCategoryAction) {
+                                return new RaisedButton(
+                                    onPressed: () {
+                                        if (_formKey.currentState.validate()) {
+                                            _formKey.currentState.save();
+                                            Category item = new Category(Uid.generateUid(), categoryName);
+
+                                            addCategoryAction(item);
+                                            Navigator.of(context).pop();
+                                        }
+                                    },
+                                    child: new Text(
+                                        this.getI18nValue(context, "save")
+                                    ),
+                                );
+
+                            },
+                        ),
+                    ],
+                );
+
+            }
+        );
+
+    }
+
     void handleClickHideCheckbox(InfoDetail item, bool checked) {
         setState(() {
             item.setIsHide(checked);
@@ -245,10 +330,30 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
     }
 
 
-    void handleClickSave() {
+    void handleClickSave(BuildContext context) {
+        if (this._currentInfo.categoryId.isEmpty) {
+            Fluttertoast.showToast(
+                msg: this.getI18nValue(context, "category_can_not_empty")
+            );
+            return;
+        }
         if (_formKey.currentState.validate()) {
             _formKey.currentState.save();
-            print(this._currentInfo.toString());
+
+            Store<AppState> store = StoreProvider.of<AppState>(context);
+            AddInfoAction action;
+
+            if (this.isEdit()) {
+
+            } else {
+                action = new AddInfoAction(this._currentInfo);
+            }
+            store.dispatch(action);
+
+            new Future.delayed(new Duration(milliseconds: 1500), () {
+                Navigator.pop(context);
+
+            });
         }
     }
 

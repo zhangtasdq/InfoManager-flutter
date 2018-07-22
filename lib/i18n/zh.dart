@@ -7,7 +7,9 @@ const Map<String, String> ZH = {
     "info_list": "信息",
     "info_is_empty": "信息为空",
     "category": "分类",
+    "category_name": "分类名",
     "please_select_category": "请选择分类",
+    "please_input_category_name": "请输入分类名",
     "edit_info": "编辑信息",
     "create_info": "添加信息",
     "title": "标题",
@@ -19,5 +21,12 @@ const Map<String, String> ZH = {
     "hide": "隐藏",
     "title_can_not_empty": "标题不能为空",
     "property_can_not_empty": "属性名不能为空",
-    "content_can_not_empty": "内容不能为空"
+    "content_can_not_empty": "内容不能为空",
+    "confirm": "确定",
+    "cancel": "取消",
+    "add": "添加",
+    "save": "保存",
+    "select_category": "选择分类",
+    "category_can_not_empty": "分类不能为空",
+    "save_success": "保存成功"
 };

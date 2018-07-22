@@ -7,7 +7,9 @@ const Map<String, String> EN = {
     "info_list": "Info List",
     "info_is_empty": "Info is empty",
     "category": "category",
+    "category_name": "category name",
     "please_select_category": "Please select category",
+    "please_input_category_name": "Please input category name",
     "edit_info": "Edit Info",
     "create_info": "Add Info",
     "title": "title",
@@ -19,5 +21,12 @@ const Map<String, String> EN = {
     "hide": "hide",
     "title_can_not_empty": "title can not empty",
     "property_can_not_empty": "property can not empty",
-    "content_can_not_empty": "content can not empty"
+    "content_can_not_empty": "content can not empty",
+    "confirm": "confirm",
+    "cancel": "cancel",
+    "add": "add",
+    "save": "save",
+    "select_category": "Select category",
+    "category_can_not_empty": "Category can not empty",
+    "save_success": "Save Success"
 };

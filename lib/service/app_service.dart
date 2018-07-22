@@ -21,8 +21,9 @@ class AppService {
             AppState state = store.state;
             String encryptStr = await FileService.getFileContent();
             String dataStr = await EncryptService.decryptStr(state.userInfo.getPassword(), encryptStr);
-
             Map<String, dynamic> data = json.decode(dataStr);
+
+            print(dataStr);
 
             if (data.containsKey("infos")) {
                 loadAppInfos(data["infos"], store);
@@ -43,7 +44,7 @@ class AppService {
         if (infos.length > 0) {
 
             for (int i = 0, j = infos.length; i < j; ++i) {
-                Map<String, dynamic> item = infos[i];
+                Map<String, dynamic> item = json.decode(infos[i]);
 
                 datas.add(new Info.fromJson(item));
             }
@@ -56,9 +57,8 @@ class AppService {
     static void loadAppCategories(List<dynamic> categories, Store<AppState> store) {
         List<Category> datas = [];
         if (categories.length > 0) {
-
             for (int i = 0, j = categories.length; i < j; ++i) {
-                Map<String, dynamic> item = categories[i];
+                Map<String, dynamic> item = json.decode(categories[i]);
 
                 datas.add(new Category.fromJson(item));
             }
@@ -78,21 +78,21 @@ class AppService {
     }
 
     static Future<void> saveAppStateData(AppState state) async {
-        print("------------ save");
         String dataStr = getSaveAppStateData(state);
+        print("save ==> $dataStr");
         String decryptStr = await EncryptService.encryptStr(state.userInfo.getPassword(), dataStr);
 
         FileService.saveFileContent(decryptStr);
     }
 
     static String getSaveAppStateData(AppState state) {
-        String infos = state.infos.map((Info item) => json.encode(item)).join(",");
-        String categories = state.categories.map((Category item) => json.encode(item)).join(",");
+        List<String> infos = state.infos.map((Info item) => json.encode(item)).toList();
         String userInfo = json.encode(state.userInfo.getSaveData());
+        List<String> categories = state.categories.map((Category item) => json.encode(item)).toList();
 
         Map<String, dynamic> data = {
-            "infos": infos.length == 0 ? [] : [infos],
-            "categories": categories.length == 0 ? [] : [categories],
+            "infos": infos,
+            "categories": categories,
             "userInfo": userInfo
         };
 

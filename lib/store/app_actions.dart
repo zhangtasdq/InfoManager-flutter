@@ -32,6 +32,12 @@ class SetCategoriesAction {
     SetCategoriesAction(this.categories);
 }
 
+class AddCategoryAction {
+    final Category category;
+
+    AddCategoryAction(this.category);
+}
+
 class SetUserInfoAction {
     final UserInfo userInfo;
 

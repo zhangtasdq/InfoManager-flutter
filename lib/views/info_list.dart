@@ -44,12 +44,17 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
                         child: new Text(this.getI18nValue(context, "info_is_empty")),
                     );
                 }
-                return new Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                    ],
-                );
 
+                return new ListView.builder(
+                    itemCount: infos.length,
+                    itemBuilder: (context, i) {
+                        Info item = infos[i];
+
+                        return new ListTile(
+                            title: new Text(item.title),
+                        );
+                    }
+                );
             },
         );
     }

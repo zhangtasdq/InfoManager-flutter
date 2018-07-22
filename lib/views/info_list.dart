@@ -5,6 +5,7 @@ import "package:info_manager/model/info.dart";
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/views/info_edit.dart";
+import "package:info_manager/views/info_show.dart";
 
 class InfoListPage extends StatefulWidget {
     _InfoListPageState createState() => new _InfoListPageState();
@@ -52,6 +53,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
 
                         return new ListTile(
                             title: new Text(item.title),
+                            onTap: () => this.handleClickInfoItem(context, item),
                         );
                     }
                 );
@@ -133,6 +135,17 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
             )
         );
         
+    }
+
+    void handleClickInfoItem(BuildContext context, Info info) {
+        Navigator.of(context).push(
+            new MaterialPageRoute(
+                builder: (BuildContext context) {
+                    return new InfoShowPage(info.id);
+                }
+            )
+        );
+
     }
 
     @override

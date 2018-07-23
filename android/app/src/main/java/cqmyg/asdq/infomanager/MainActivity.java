@@ -26,15 +26,21 @@ public class MainActivity extends FlutterActivity {
                     @Override
                     public void onMethodCall(MethodCall methodCall, Result result) {
                         OneDriveService service = new OneDriveService();
+
                         String clientId = methodCall.argument("clientId");
+                        String fileName = methodCall.argument("fileName");
+
                         ArrayList<String> scopeList = methodCall.argument("scope");
 
                         String[] scope = scopeList.toArray(new String[scopeList.size()]);
 
                         if (methodCall.method.equals("isFileExists")) {
-                            String fileName = methodCall.argument("fileName");
-
                             service.isFileExists(fileName, clientId, scope,MainActivity.this, result);
+                        } else if (methodCall.method.equals("saveFile")) {
+                            String content = methodCall.argument("content");
+                            service.saveFile(fileName, content, clientId, scope, MainActivity.this, result);
+                        } else if (methodCall.method.equals("downloadFile")) {
+                            service.downloadFile(fileName, clientId, scope, MainActivity.this, result);
                         } else {
                             result.notImplemented();
                         }

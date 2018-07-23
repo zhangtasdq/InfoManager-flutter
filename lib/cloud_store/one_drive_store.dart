@@ -25,6 +25,35 @@ class OneDriveStore extends CloudStore {
 
     }
 
+    saveFile(String fileName, String content, StoreCallback callback) async {
+        try {
+            Map<String, dynamic> data = this.getDefaultParams();
+
+            data["fileName"] = fileName;
+            data["content"] = content;
+
+            bool success = await platform.invokeMethod("saveFile", data);
+
+            callback(null, [success]);
+        } on PlatformException catch (e) {
+            callback(e);
+        }
+    }
+
+    downloadFile(String fileName, StoreCallback callback) async {
+        try {
+            Map<String, dynamic> data = this.getDefaultParams();
+
+            data["fileName"] = fileName;
+
+            String content = await platform.invokeMethod("downloadFile", data);
+
+            callback(null, [content]);
+        } on PlatformException catch (e) {
+            callback(e);
+        }
+    }
+
     Map<String, dynamic> getDefaultParams() {
         Map<String, dynamic> params = new Map();
 

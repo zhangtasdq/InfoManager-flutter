@@ -35,6 +35,11 @@ class SetPasswordAction {
     SetPasswordAction(this.password);
 }
 
+class ToggleDeleteFileWhenPasswordErrorAction {
+    final isEnable;
+    ToggleDeleteFileWhenPasswordErrorAction(this.isEnable);
+}
+
 class SetInfosAction {
     final List<Info> infos;
 

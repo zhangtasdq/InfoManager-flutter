@@ -41,4 +41,6 @@ const Map<String, String> EN = {
     "file_not_exist": "file not exist",
     "backup_info_success": "Backup success",
     "backup_info_failed": "Backup failed",
+    "setting": "Setting",
+    "delete_file_when_password_error_more_than_5_times": "delete file when password error more than 5 times"
 };

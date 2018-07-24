@@ -1,7 +1,6 @@
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
-import "dart:developer";
 
 import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
@@ -182,7 +181,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
                             size: 36.0,
                             color: Colors.white,
                         ),
-                        onPressed: null
+                        onPressed: () => this.handleClickSetting(context)
                     )
                 ],
             ),
@@ -312,7 +311,10 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
                 }
             )
         );
+    }
 
+    void handleClickSetting(BuildContext context) {
+        Navigator.of(context).pushNamed("setting");
     }
 
     List<Category> getAllCategories(BuildContext context) {

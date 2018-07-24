@@ -14,6 +14,7 @@ import "package:info_manager/service/app_service.dart";
 
 import "package:info_manager/views/login.dart";
 import "package:info_manager/views/info_list.dart";
+import "package:info_manager/views/setting.dart";
 
 void main() {
     runApp(new InfoManager());
@@ -80,7 +81,8 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
                 ],
                 routes: {
                     "loginView": (BuildContext context) => new LoginPage(),
-                    "infoListView": (BuildContext context) => new InfoListPage()
+                    "infoListView": (BuildContext context) => new InfoListPage(),
+                    "setting": (BuildContext context) => new Setting()
                 },
             )
         );

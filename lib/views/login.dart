@@ -136,9 +136,9 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
 
 
                 new Future.delayed(new Duration(milliseconds: 500), () {
-                    store.dispatch(new SetIsInitAction(true));
+                    store.dispatch(new SetListenStoreStatusAction(true));
                 });
-                Navigator.pushReplacementNamed(context, "infoListView");
+                Navigator.pushNamed(context, "infoListView");
             } else {
                 Fluttertoast.showToast(
                     msg: this.getI18nValue(context, "password_is_error")

@@ -5,7 +5,8 @@ class CloudStoreService {
     static CloudStore oneDriveStore = new OneDriveStore();
 
 
-    static isFileExists(String fileName, StoreCallback callback, {String saveType = "oneDrive"}) {
+    static isFileExists(String fileName, StoreCallback callback,
+        {String saveType = "oneDrive"}) {
         CloudStore store;
         if (saveType == "oneDrive") {
             store = oneDriveStore;
@@ -14,5 +15,28 @@ class CloudStoreService {
         if (store != null) {
             store.isFileExists(fileName, callback);
         }
+    }
+
+    static saveFile(String fileName, String content, StoreCallback callback,
+        {String saveType = "oneDrive"}) {
+
+        CloudStore store;
+        if (saveType == "oneDrive") {
+            store = oneDriveStore;
+        }
+
+        store.saveFile(fileName, content, callback);
+    }
+
+    static downloadFile(String fileName, StoreCallback callback,
+        {String saveType = "oneDrive"}) {
+
+        CloudStore store;
+
+        if (saveType == "oneDrive") {
+            store = oneDriveStore;
+        }
+
+        store.downloadFile(fileName, callback);
     }
 }

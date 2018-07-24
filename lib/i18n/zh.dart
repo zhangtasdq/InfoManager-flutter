@@ -31,5 +31,15 @@ const Map<String, String> ZH = {
     "save_success": "保存成功",
     "detail_is_empty": "详情为空",
     "delete_info": "删除信息",
-    "is_delete_info": "确认删除信息?"
+    "is_delete_info": "确认删除信息?",
+    "backup_info": "备份信息",
+    "confirm_backup_info": "确认备份信息?",
+    "restore_info": "还原信息",
+    "confirm_restore_info": "确认还原信息?",
+    "restore_info_failed": "还原信息失败,请稍候重试",
+    "restore_info_success": "还原信息成功",
+    "file_not_exist": "文件不存在",
+    "backup_info_success": "备份成功",
+    "backup_info_failed": "备份失败",
+
 };

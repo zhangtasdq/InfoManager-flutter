@@ -1,6 +1,7 @@
 package cqmyg.asdq.infomanager.service;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 
 import com.onedrive.sdk.authentication.MSAAuthenticator;
 import com.onedrive.sdk.concurrency.ICallback;
@@ -147,34 +148,9 @@ public class OneDriveService {
         this.getOneDriveClient(clientId, oneDriveScope, activity, new ICallback<Void>() {
             @Override
             public void success(Void aVoid) {
-                IOneDriveClient client = OneDriveService.this.oneDriveClient;
+                AsyncTask<Void, Void, Void> task = new DownloadTask(OneDriveService.this.oneDriveClient, fileName, callback);
 
-                try {
-                    final InputStream inputStream = client.getDrive().
-                            getSpecial("approot").
-                            getChildren().
-                            byId(fileName).
-                            getContent().
-                            buildRequest().
-                            get();
-
-                    byte[] buffer = new byte[1024];
-                    int len = 0;
-                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                    while((len = inputStream.read(buffer)) != -1) {
-                        byteArrayOutputStream.write(buffer, 0, len);
-                    }
-
-                    inputStream.close();
-                    byteArrayOutputStream.close();
-
-                    String data = byteArrayOutputStream.toString();
-                    callback.success(data);
-                } catch (IOException e) {
-                    callback.error("OneDriveError", e.getMessage(), e);
-                    e.printStackTrace();
-                }
+                task.execute();
             }
 
             @Override
@@ -183,6 +159,49 @@ public class OneDriveService {
                 ex.printStackTrace();
             }
         });
+    }
+
+    private static class DownloadTask extends AsyncTask<Void, Void, Void> {
+        IOneDriveClient client;
+        String fileName;
+        Result callback;
+
+        DownloadTask(IOneDriveClient client, String fileName, Result callback) {
+            this.client = client;
+            this.fileName = fileName;
+            this.callback = callback;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                final InputStream inputStream = this.client.getDrive().
+                        getSpecial("approot").
+                        getChildren().
+                        byId(fileName).
+                        getContent().
+                        buildRequest().
+                        get();
+
+                byte[] buffer = new byte[1024];
+                int len = 0;
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                while((len = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, len);
+                }
+
+                inputStream.close();
+                byteArrayOutputStream.close();
+
+                String data = byteArrayOutputStream.toString();
+                callback.success(data);
+            } catch (IOException e) {
+                callback.error("OneDriveError", e.getMessage(), e);
+                e.printStackTrace();
+            }
+            return null;
+        }
     }
 
 }

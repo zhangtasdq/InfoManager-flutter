@@ -1,9 +1,11 @@
 import "package:flutter/material.dart";
+import "package:flutter/widgets.dart";
 import "package:flutter_localizations/flutter_localizations.dart";
 import "package:flutter/rendering.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
+import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_reducer.dart";
 
@@ -17,16 +19,38 @@ void main() {
     runApp(new InfoManager());
 }
 
-class InfoManager extends StatelessWidget {
+class InfoManager extends StatefulWidget {
+    @override
+    _InfoManagerState createState() => new _InfoManagerState();
+}
+
+class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
     bool previousInitState = false;
     Store<AppState> store;
+    BuildContext appContext;
 
-    InfoManager() {
+    @override
+    void initState() {
+        super.initState();
         store = new Store<AppState>(
             appReducer,
             initialState: new AppState(),
         );
         store.onChange.listen(this.handleStateChange);
+        WidgetsBinding.instance.addObserver(this);
+    }
+
+    @override
+    void dispose() {
+        WidgetsBinding.instance.removeObserver(this);
+        super.dispose();
+    }
+
+    @override
+    void didChangeAppLifecycleState(AppLifecycleState state) {
+        if (state == AppLifecycleState.paused) {
+            this.handleAppPause();
+        }
     }
 
 
@@ -39,7 +63,12 @@ class InfoManager extends StatelessWidget {
                 theme: new ThemeData(
                     primaryColor: Colors.blue
                 ),
-                home: new LoginPage(),
+                home: Builder(
+                    builder: (context) {
+                        this.appContext = context;
+                        return new LoginPage();
+                    }
+                ),
                 localizationsDelegates: [
                     const InfoManagerLocalizationsDelegate(),
                     GlobalMaterialLocalizations.delegate,
@@ -50,6 +79,7 @@ class InfoManager extends StatelessWidget {
                     const Locale("zh", "")
                 ],
                 routes: {
+                    "loginView": (BuildContext context) => new LoginPage(),
                     "infoListView": (BuildContext context) => new InfoListPage()
                 },
             )
@@ -62,8 +92,14 @@ class InfoManager extends StatelessWidget {
         }
     }
 
+    void handleAppPause() {
+        ResetAppAction action = new ResetAppAction();
+        this.store.dispatch(action);
+        Navigator.of(this.appContext).pushNamedAndRemoveUntil("loginView", (Route<dynamic> route) => false);
+    }
+
     bool shouldSaveAppState(AppState state) {
-        if (!state.isInit) {
+        if (!state.isListen) {
             return false;
         }
 

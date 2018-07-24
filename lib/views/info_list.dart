@@ -1,20 +1,26 @@
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
+import "dart:developer";
 
 import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
 import "package:info_manager/store/app_state.dart";
+import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/views/info_edit.dart";
 import "package:info_manager/views/info_show.dart";
+import "package:info_manager/service/app_service.dart";
+import "package:info_manager/mixins/msg_mixin.dart";
+import "package:info_manager/configure/status_code.dart";
 
 class InfoListPage extends StatefulWidget {
     _InfoListPageState createState() => new _InfoListPageState();
 }
 
-class _InfoListPageState extends State<InfoListPage> with I18nMixin {
+class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
     String currentCategoryId;
+    bool isShowLoading = false;
 
     @override
     Widget build(BuildContext context) {
@@ -42,6 +48,10 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
             },
 
             builder: (context, stateInfos) {
+                if (this.isShowLoading) {
+                    return this.buildLoading(context);
+                }
+
                 List<Info> infos = [];
 
                 if (this.currentCategoryId != null && stateInfos.length > 0) {
@@ -69,6 +79,12 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
                     }
                 );
             },
+        );
+    }
+
+    Widget buildLoading(BuildContext context) {
+        return new Center(
+            child: new CircularProgressIndicator(),
         );
     }
 
@@ -150,7 +166,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
                             size: 36.0,
                             color: Colors.white
                         ),
-                        onPressed: null
+                        onPressed: () => this.handleBackupInfo(context)
                     ),
                     new IconButton(
                         icon: new Icon(
@@ -158,7 +174,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
                             size: 36.0,
                             color: Colors.white
                         ),
-                        onPressed: null
+                        onPressed: () => this.handleRestoreInfo(context)
                     ),
                     new IconButton(
                         icon: new Icon(
@@ -188,7 +204,104 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin {
                 }
             )
         );
+    }
 
+    void handleBackupInfo(BuildContext context) {
+        BuildContext topContext = context;
+
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return new AlertDialog(
+                    title: new Text(this.getI18nValue(context, "backup_info")),
+                    content: new Text(this.getI18nValue(context, "confirm_backup_info")),
+                    actions: <Widget>[
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "cancel")),
+                            onPressed: () => Navigator.of(context).pop()
+                        ),
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "confirm")),
+                            onPressed: () {
+                                Navigator.of(context).pop();
+                                this.executeBackupInfo(topContext);
+                            }
+                        )
+                    ],
+                );
+            }
+        );
+    }
+
+    void executeBackupInfo(BuildContext context) {
+        setState(() {
+            isShowLoading = true;
+        });
+        AppService.backupInfo((dynamic error, {dynamic data}) {
+            if (error != null) {
+                this.showToast(this.getI18nValue(context, "backup_info_failed"));
+            } else if (data != null) {
+                this.showToast(this.getI18nValue(context, "backup_info_success"));
+            }
+            setState(() {
+                isShowLoading = false;
+            });
+        });
+    }
+
+    void handleRestoreInfo(BuildContext context) {
+        BuildContext topContext = context;
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return new AlertDialog(
+                    title: new Text(this.getI18nValue(context, "restore_info")),
+                    content: new Text(this.getI18nValue(context, "confirm_restore_info")),
+                    actions: <Widget>[
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "cancel")),
+                            onPressed: () => Navigator.of(context).pop()
+                        ),
+                        new RaisedButton(
+                            child: new Text(this.getI18nValue(context, "confirm")),
+                            onPressed: () {
+                                Navigator.of(context).pop();
+                                this.executeRestoreInfo(topContext);
+                            }
+                        )
+                    ],
+                );
+            }
+        );
+    }
+
+    void executeRestoreInfo(BuildContext context) {
+        Store<AppState> store = this.getStore(context);
+        SetListenStoreStatusAction action = new SetListenStoreStatusAction(false);
+        store.dispatch(action);
+
+
+        setState(() {
+            isShowLoading = true;
+        });
+
+        AppService.restoreInfo(store, (error, [statusCode]) {
+            if (error != null) {
+                this.showToast(this.getI18nValue(context, "restore_info_failed"));
+            } else {
+                if (statusCode == StatusCode.FILE_NOT_EXIST) {
+                    this.showToast(this.getI18nValue(context, "file_not_exist"));
+                } else {
+                    this.showToast(this.getI18nValue(context, "restore_info_success"));
+                }
+            }
+            setState(() {
+                isShowLoading = false;
+            });
+
+            SetListenStoreStatusAction action = new SetListenStoreStatusAction(true);
+            store.dispatch(action);
+        });
     }
 
     void handleClickInfoItem(BuildContext context, Info info) {

@@ -11,7 +11,12 @@ import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/service/file_service.dart";
 import "package:info_manager/util/password_padding.dart" show passwordPadding;
 import "package:info_manager/configure/app_configure.dart";
+import "package:info_manager/configure/status_code.dart";
 import "package:info_manager/service/encrypt_service.dart";
+import "package:info_manager/cloud_store/cloud_store.dart";
+import "package:info_manager/service/cloud_store_service.dart";
+
+typedef void Callback(dynamic error, [dynamic data]);
 
 class AppService {
     static Future<void> loadAppStateData(Store<AppState> store) async {
@@ -108,5 +113,32 @@ class AppService {
 
         print(paddingPassword);
         return cryptor.encrypt(content, key);
+    }
+
+    static backupInfo(StoreCallback callback) async {
+        bool isFileExist = await FileService.isFileExist();
+
+        if (isFileExist) {
+            String encryptStr = await FileService.getFileContent();
+            String fileName = APP_CONFIGURE["INFO_FILE_NAME"];
+            CloudStoreService.saveFile(fileName, encryptStr, callback);
+        }
+    }
+
+    static restoreInfo(Store<AppState> store, Callback callback) async {
+        String fileName = APP_CONFIGURE["INFO_FILE_NAME"];
+
+        CloudStoreService.downloadFile(fileName, (downloadError, {dynamic data}) {
+            if (downloadError != null) {
+                callback(downloadError);
+            } else {
+                if (data != null) {
+                    FileService.saveFileContent(data);
+                    loadAppStateData(store);
+                }
+                callback(null, [StatusCode.RESTORE_SUCCESS]);
+            }
+
+        });
     }
 }

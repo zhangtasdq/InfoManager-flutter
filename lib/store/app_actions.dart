@@ -2,10 +2,14 @@ import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
 import "package:info_manager/model/user_info.dart";
 
-class SetIsInitAction {
-    final bool isInit;
 
-    SetIsInitAction(this.isInit);
+class ResetAppAction {
+}
+
+class SetListenStoreStatusAction {
+    final bool status;
+
+    SetListenStoreStatusAction(this.status);
 }
 
 class AddInfoAction {

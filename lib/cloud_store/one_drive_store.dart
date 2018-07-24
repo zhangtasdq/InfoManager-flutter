@@ -18,7 +18,7 @@ class OneDriveStore extends CloudStore {
 
             bool isExist = await platform.invokeMethod("isFileExists", data);
 
-            callback(null, [isExist]);
+            callback(null, data: isExist);
         } on PlatformException catch (e) {
             callback(e);
         }
@@ -34,7 +34,7 @@ class OneDriveStore extends CloudStore {
 
             bool success = await platform.invokeMethod("saveFile", data);
 
-            callback(null, [success]);
+            callback(null, data: success);
         } on PlatformException catch (e) {
             callback(e);
         }
@@ -48,7 +48,7 @@ class OneDriveStore extends CloudStore {
 
             String content = await platform.invokeMethod("downloadFile", data);
 
-            callback(null, [content]);
+            callback(null, data: content);
         } on PlatformException catch (e) {
             callback(e);
         }

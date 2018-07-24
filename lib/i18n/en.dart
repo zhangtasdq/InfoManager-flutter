@@ -32,4 +32,13 @@ const Map<String, String> EN = {
     "detail_is_empty": "detail is empty",
     "delete_info": "Delete info",
     "is_delete_info": "Confirm delete info?",
+    "backup_info": "Backup Info",
+    "confirm_backup_info": "Confirm backup info?",
+    "restore_info": "Restore Info",
+    "confirm_restore_info": "Confirm restore info",
+    "restore_info_failed": "Restore failed",
+    "restore_info_success": "Restore success",
+    "file_not_exist": "file not exist",
+    "backup_info_success": "Backup success",
+    "backup_info_failed": "Backup failed",
 };

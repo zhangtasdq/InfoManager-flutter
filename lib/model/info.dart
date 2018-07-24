@@ -43,6 +43,10 @@ class Info {
         return this.details.length;
     }
 
+    void removeDetailItemByIndex(int index) {
+        this.details.removeAt(index);
+    }
+
     void addEmptyDetailItem() {
         var item = new InfoDetail(Uid.generateUid(), "", "", true);
 

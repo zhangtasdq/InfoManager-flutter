@@ -158,60 +158,74 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
 
         return new Card(
             child: new Container(
-                padding: EdgeInsets.all(10.0),
-                child: new Column(
-                    children: <Widget>[
-                        TextFormField(
-                            decoration: new InputDecoration(
-                                labelText: this.getI18nValue(context, "property"),
-                                hintText: this.getI18nValue(context, "please_input_property"),
-                            ),
-                            validator: (value) {
-                                if (value.isEmpty) {
-                                    return this.getI18nValue(context, "property_can_not_empty");
-                                }
-                            },
-                            onSaved: (value) {
-                                item.setPropertyName(value);
-                            },
-                            initialValue: item.propertyName,
-
+                padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
+                child: new Stack(children: <Widget>[
+                    new Positioned(
+                        child: new IconButton(
+                            icon: new Icon(Icons.close, color: Colors.red,),
+                            onPressed: () => this.handleDeleteInfoDetailItem(detailIndex)
                         ),
-
-                        new Row(
+                        top: 0.0,
+                        right: 0.0,
+                    ),
+                    new Container(
+                        margin: EdgeInsets.only(top: 25.0),
+                        child: new Column(
                             children: <Widget>[
-                                new Expanded(
-                                    child: new TextFormField(
-                                        decoration: new InputDecoration(
-                                            labelText: this.getI18nValue(context, "content"),
-                                            hintText: this.getI18nValue(context, "please_input_content"),
+                                TextFormField(
+                                    decoration: new InputDecoration(
+                                        labelText: this.getI18nValue(context, "property"),
+                                        hintText: this.getI18nValue(context, "please_input_property"),
+                                    ),
+                                    validator: (value) {
+                                        if (value.isEmpty) {
+                                            return this.getI18nValue(context, "property_can_not_empty");
+                                        }
+                                    },
+                                    onSaved: (value) {
+                                        item.setPropertyName(value);
+                                    },
+                                    initialValue: item.propertyName,
+
+                                ),
+
+                                new Row(
+                                    children: <Widget>[
+                                        new Expanded(
+                                            child: new TextFormField(
+                                                decoration: new InputDecoration(
+                                                    labelText: this.getI18nValue(context, "content"),
+                                                    hintText: this.getI18nValue(context, "please_input_content"),
+                                                ),
+                                                validator: (value) {
+                                                    if (value.isEmpty) {
+                                                        return this.getI18nValue(context, "content_can_not_empty");
+                                                    }
+                                                },
+                                                onSaved: (value) {
+                                                    item.setPropertyValue(value);
+                                                },
+                                                initialValue: item.propertyValue,
+                                            ),
                                         ),
-                                        validator: (value) {
-                                            if (value.isEmpty) {
-                                                return this.getI18nValue(context, "content_can_not_empty");
-                                            }
-                                        },
-                                        onSaved: (value) {
-                                            item.setPropertyValue(value);
-                                        },
-                                        initialValue: item.propertyValue,
-                                    ),
-                                ),
-                                new Padding(
-                                    padding: EdgeInsets.only(top: 35.0),
-                                    child: new Checkbox(
-                                        value: item.isHide(),
-                                        onChanged: (bool checked) => this.handleClickHideCheckbox(item, checked)
-                                    ),
-                                ),
-                                new Padding(
-                                    padding: EdgeInsets.only(top: 35.0),
-                                    child: new Text(this.getI18nValue(context, "hide"))
+                                        new Padding(
+                                            padding: EdgeInsets.only(top: 35.0),
+                                            child: new Checkbox(
+                                                value: item.isHide(),
+                                                onChanged: (bool checked) => this.handleClickHideCheckbox(item, checked)
+                                            ),
+                                        ),
+                                        new Padding(
+                                            padding: EdgeInsets.only(top: 35.0),
+                                            child: new Text(this.getI18nValue(context, "hide"))
+                                        )
+                                    ],
                                 )
                             ],
-                        )
-                    ],
-                ),
+                        ),
+                    ),
+
+                ],),
             ),
         );
     }
@@ -249,6 +263,12 @@ class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
         } else {
             this._currentInfo = new Info(Uid.generateUid(), "", "", []);
         }
+    }
+
+    void handleDeleteInfoDetailItem(int index) {
+        setState(() {
+            this._currentInfo.removeDetailItemByIndex(index);
+        });
     }
 
     void handleSelectCategory(BuildContext context, Category category) {

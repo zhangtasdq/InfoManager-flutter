@@ -112,6 +112,7 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
     Widget buildInfoDetailItem(BuildContext context, InfoDetail item) {
         return new Card(
             child: new GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () {
                     this.handleTabHideDetailItem(item);
                 },

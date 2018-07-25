@@ -44,6 +44,7 @@ class AppService {
         }
     }
 
+
     static void loadAppInfos(List<dynamic> infos, Store<AppState> store) {
         List<Info> datas = [];
         if (infos.length > 0) {
@@ -80,6 +81,10 @@ class AppService {
 
         store.dispatch(action);
 
+    }
+
+    static Future<void> deleteFile() async {
+        return FileService.deleteFile();
     }
 
     static Future<void> saveAppStateData(AppState state) async {

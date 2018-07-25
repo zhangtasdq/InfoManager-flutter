@@ -10,6 +10,7 @@ import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/service/user_service.dart";
 import "package:info_manager/service/app_service.dart";
+import "package:info_manager/service/shared_preference_service.dart";
 
 typedef void SetPasswordActionType(String password);
 
@@ -21,6 +22,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with I18nMixin {
     String currentPassword;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+    int inputErrorCount = 0;
 
     @override
     Widget build(BuildContext context) {
@@ -138,12 +140,35 @@ class _LoginPageState extends State<LoginPage> with I18nMixin {
                 new Future.delayed(new Duration(milliseconds: 500), () {
                     store.dispatch(new SetListenStoreStatusAction(true));
                 });
-                Navigator.pushNamed(context, "infoListView");
+                Navigator.pushReplacementNamed(context, "infoListView");
             } else {
-                Fluttertoast.showToast(
-                    msg: this.getI18nValue(context, "password_is_error")
-                );
+                bool isEnableDeleteFile = await SharedPreferenceService.getIsEnableDeleteFile();
+
+                if (isEnableDeleteFile) {
+                    this.inputErrorCount++;
+                }
+
+                if (this.inputErrorCount == this.getErrorPasswordMaxCount(context)) {
+                    Fluttertoast.showToast(
+                        msg: this.getI18nValue(context, "input_password_error_more_than_max_count")
+                    );
+                    await AppService.deleteFile();
+                } else {
+                    Fluttertoast.showToast(
+                        msg: this.getI18nValue(context, "password_is_error")
+                    );
+                }
             }
         }
+    }
+
+    int getErrorPasswordMaxCount(BuildContext context) {
+        Store<AppState> store = this.getStore(context);
+
+        return store.state.userInfo.maxErrorCount;
+    }
+
+    Store<AppState> getStore(BuildContext context) {
+        return StoreProvider.of<AppState>(context);
     }
 }

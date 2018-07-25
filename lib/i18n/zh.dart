@@ -42,6 +42,7 @@ const Map<String, String> ZH = {
     "backup_info_success": "备份成功",
     "backup_info_failed": "备份失败",
     "setting": "设置",
-    "delete_file_when_password_error_more_than_5_times": "当密码错误超过5次删除文件"
+    "delete_file_when_password_error_more_than_5_times": "当密码错误超过5次删除文件",
+    "input_password_error_more_than_max_count": "密码错误次数太多,将删除密码文件"
 
 };

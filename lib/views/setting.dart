@@ -1,11 +1,6 @@
 import "package:flutter/material.dart";
-import "package:redux/redux.dart";
-import "package:flutter_redux/flutter_redux.dart";
-
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/model/user_info.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
+import "package:info_manager/service/shared_preference_service.dart";
 
 
 class Setting extends StatefulWidget {
@@ -15,6 +10,18 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> with I18nMixin {
+    bool isEnableDeleteFile = false;
+
+    @override
+    void initState() {
+        super.initState();
+        SharedPreferenceService.getIsEnableDeleteFile().then((value) {
+            setState(() {
+                this.isEnableDeleteFile = value;
+            });
+        });
+    }
+
     @override
     Widget build(BuildContext context) {
         return new Scaffold(
@@ -47,16 +54,9 @@ class _SettingState extends State<Setting> with I18nMixin {
                                     new Expanded(
                                         child: new Text(this.getI18nValue(context, "delete_file_when_password_error_more_than_5_times"))
                                     ),
-                                    new StoreConnector<AppState, UserInfo>(
-                                        converter: (store) {
-                                            return store.state.userInfo;
-                                        },
-                                        builder: (context, userInfo) {
-                                            return new Switch(
-                                                value: userInfo.isEnableMaxErrorCount,
-                                                onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(context, currentValue)
-                                            );
-                                        },
+                                    new Switch(
+                                        value: this.isEnableDeleteFile,
+                                        onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(context, currentValue)
                                     ),
                                 ],
                             ),
@@ -67,16 +67,10 @@ class _SettingState extends State<Setting> with I18nMixin {
         );
     }
 
-    void handleToggleDeleteFileWhenPasswordError(BuildContext context, bool currentValue) {
-        Store<AppState> store = this.getStore(context);
-        ToggleDeleteFileWhenPasswordErrorAction action = new ToggleDeleteFileWhenPasswordErrorAction(currentValue);
-
+    void handleToggleDeleteFileWhenPasswordError(BuildContext context, bool currentValue) async {
+        await SharedPreferenceService.setIsEnableDeleteFile(currentValue);
         setState(() {
-            store.dispatch(action);
+            this.isEnableDeleteFile = currentValue;
         });
-    }
-
-    Store<AppState> getStore(BuildContext context) {
-        return StoreProvider.of<AppState>(context);
     }
 }

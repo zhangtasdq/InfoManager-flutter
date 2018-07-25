@@ -1,6 +1,7 @@
 const Map<String, dynamic> APP_CONFIGURE = {
     "INFO_FILE_NAME": "flutter_info_manager_file",
     "PASSWORD_LENGTH": 512,
+    "IS_ENABLE_DELETE_FILE_KEY": "IS_ENABLE_DELETE_FILE",
     "ENCRYPT_SALT": "BzUN8mw4OlF*^cDWp^kfF!Au8LzJi6H6",
     "ONE_DRIVE_SCOPE": ["onedrive.appfolder"],
     "ONE_DRIVE_CLIENT_ID": "",

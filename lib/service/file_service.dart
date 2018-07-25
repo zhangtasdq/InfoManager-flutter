@@ -29,4 +29,10 @@ class FileService {
 
         await file.writeAsString(content);
     }
+
+    static Future<File> deleteFile() async {
+        File file = await _getLocalFile();
+
+        return file.delete();
+    }
 }

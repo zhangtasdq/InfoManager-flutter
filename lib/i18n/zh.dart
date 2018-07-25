@@ -48,6 +48,12 @@ const Map<String, String> ZH = {
     "category_is_empty": "分类为空",
     "delete_category": "删除分类",
     "confirm_delete_category": "确认删除分类?",
-    "category_is_not_empty_can_not_delete": "分类不为空,不能删除"
-
+    "category_is_not_empty_can_not_delete": "分类不为空,不能删除",
+    "is_enable_fingerprint unlock": "启用指纹解锁",
+    "fingerprint": "指纹",
+    "please_auth_fingerprint": "请验证指纹",
+    "auth_fingerprint": "验证指纹",
+    "setting_fingureprint_desc": "请设置指纹",
+    "fingerprint_not_recongnized": "指纹错误",
+    "fingerprint_auth_success": "验证成功"
 };

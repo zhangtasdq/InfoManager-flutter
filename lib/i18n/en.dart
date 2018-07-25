@@ -48,5 +48,12 @@ const Map<String, String> EN = {
     "category_list": "Category list",
     "category_is_empty": "category is empty",
     "confirm_delete_category": "Confirm delete category",
-    "category_is_not_empty_can_not_delete": "category is not empty, can not delete"
+    "category_is_not_empty_can_not_delete": "category is not empty, can not delete",
+    "is_enable_fingerprint unlock": "is enable fingerprint unlock",
+    "fingerprint": "finger print",
+    "please_auth_fingerprint": "Please auth fingerprint",
+    "auth_fingerprint": "Auth Fingerprint",
+    "setting_fingureprint_desc": "please setting fingerprint",
+    "fingerprint_not_recongnized": "fingerprint error",
+    "fingerprint_auth_success": "Fingerprint auth success"
 };

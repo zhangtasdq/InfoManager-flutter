@@ -177,6 +177,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.3.0-alpha.12"
+  local_auth:
+    dependency: "direct main"
+    description:
+      name: local_auth
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.2.1"
   logging:
     dependency: transitive
     description:

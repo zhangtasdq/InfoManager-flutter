@@ -3,6 +3,8 @@ import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 import "package:fluttertoast/fluttertoast.dart";
+import "package:local_auth/local_auth.dart";
+import "package:local_auth/auth_strings.dart";
 
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_actions.dart";
@@ -23,6 +25,22 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     String currentPassword;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
     int inputErrorCount = 0;
+    bool isEnableFingerPrintUnlock = false;
+    bool isEnableDeleteFile = false;
+
+    @override
+    void initState() {
+        super.initState();
+
+        SharedPreferenceService.getIsEnableDeleteFile().then((isEnableDeleteFile) {
+            SharedPreferenceService.getIsEnableFingerPrintUnlock().then((isEnableFingerPrintUnlock) {
+                setState(() {
+                    this.isEnableDeleteFile = isEnableDeleteFile;
+                    this.isEnableFingerPrintUnlock = isEnableFingerPrintUnlock;
+                });
+            });
+        });
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -103,15 +121,39 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                                     };
                                 },
                                 builder: (context, updatePasswordAction) {
-                                    return new RaisedButton(
-                                        color: Colors.blue,
-                                        onPressed: () => this._handleLogin(context, updatePasswordAction),
-                                        child: new Text(
-                                            this.getI18nValue(context, "login"),
-                                            style: new TextStyle(
-                                                color: Colors.white
+                                    List<Widget> widgets = [];
+
+                                    widgets.add(
+                                        new RaisedButton(
+                                            color: Colors.blue,
+                                            onPressed: () => this._handleLogin(context, updatePasswordAction),
+                                            child: new Text(
+                                                this.getI18nValue(context, "login"),
+                                                style: new TextStyle(
+                                                    color: Colors.white
+                                                )
+                                            ),
+                                        )
+                                    );
+
+                                    if (this.isEnableFingerPrintUnlock) {
+                                        widgets.add(
+                                            new RaisedButton(
+                                                color: Colors.teal,
+                                                onPressed: () => this.handleFingerLogin(context, updatePasswordAction),
+                                                child: new Text(
+                                                    this.getI18nValue(context, "fingerprint"),
+                                                    style: new TextStyle(
+                                                        color: Colors.white
+                                                    )
+                                                ),
                                             )
-                                        ),
+                                        );
+                                    }
+
+                                    return new Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                        children: widgets,
                                     );
                                 },
                             ),
@@ -130,36 +172,70 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
             bool loginSuccess = await UserService.login(this.currentPassword);
 
             if (loginSuccess) {
-                updatePasswordAction(this.currentPassword);
-
-
-                Store<AppState> store = StoreProvider.of<AppState>(context);
-                await AppService.loadAppStateData(store);
-
-
-                new Future.delayed(new Duration(milliseconds: 500), () {
-                    store.dispatch(new SetListenStoreStatusAction(true));
-                });
-                Navigator.pushReplacementNamed(context, "infoListView");
+                this.handleLoginSuccess(context, this.currentPassword, updatePasswordAction);
             } else {
-                bool isEnableDeleteFile = await SharedPreferenceService.getIsEnableDeleteFile();
-
-                if (isEnableDeleteFile) {
-                    this.inputErrorCount++;
-                }
-
-                if (this.inputErrorCount == this.getErrorPasswordMaxCount(context)) {
-                    Fluttertoast.showToast(
-                        msg: this.getI18nValue(context, "input_password_error_more_than_max_count")
-                    );
-                    await AppService.deleteFile();
-                } else {
-                    Fluttertoast.showToast(
-                        msg: this.getI18nValue(context, "password_is_error")
-                    );
-                }
+                await this.handlePasswordError();
             }
         }
+    }
+
+    void handleFingerLogin(BuildContext context, SetPasswordActionType updatePasswordAction) async {
+        var localAuth = new LocalAuthentication();
+        dynamic androidStrings = AndroidAuthMessages(
+            cancelButton: this.getI18nValue(context, "cancel"),
+            goToSettingsButton: this.getI18nValue(context, "setting"),
+            goToSettingsDescription: this.getI18nValue(context, "setting_fingureprint_desc"),
+            fingerprintNotRecognized: this.getI18nValue(context, "fingerprint_not_recongnized"),
+            signInTitle: this.getI18nValue(context, "auth_fingerprint"),
+            fingerprintSuccess: this.getI18nValue(context, "fingerprint_auth_success")
+        );
+
+        bool didAuthenticate = await localAuth.authenticateWithBiometrics(
+            localizedReason: this.getI18nValue(context, "please_auth_fingerprint"),
+            androidAuthStrings: androidStrings,
+            useErrorDialogs: false
+        );
+
+        if (didAuthenticate) {
+            String password = await SharedPreferenceService.getUserPassword();
+            this.handleLoginSuccess(context, password, updatePasswordAction);
+        } else {
+            await this.handlePasswordError();
+        }
+
+    }
+
+    Future<Null> handlePasswordError() async {
+        if (this.isEnableDeleteFile) {
+            this.inputErrorCount++;
+        }
+
+        if (this.inputErrorCount == this.getErrorPasswordMaxCount(context)) {
+            Fluttertoast.showToast(
+                msg: this.getI18nValue(context, "input_password_error_more_than_max_count")
+            );
+            await AppService.deleteFile();
+        } else {
+            Fluttertoast.showToast(
+                msg: this.getI18nValue(context, "password_is_error")
+            );
+        }
+
+        return null;
+    }
+
+    void handleLoginSuccess(BuildContext context, String password, SetPasswordActionType updatePasswordAction) async {
+        updatePasswordAction(password);
+
+
+        Store<AppState> store = StoreProvider.of<AppState>(context);
+        await AppService.loadAppStateData(store);
+
+
+        new Future.delayed(new Duration(milliseconds: 100), () {
+            store.dispatch(new SetListenStoreStatusAction(true));
+        });
+        Navigator.pushReplacementNamed(context, "infoListView");
     }
 
     int getErrorPasswordMaxCount(BuildContext context) {

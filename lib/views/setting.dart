@@ -1,5 +1,9 @@
+import "package:redux/redux.dart";
+import "package:flutter_redux/flutter_redux.dart";
 import "package:flutter/material.dart";
+
 import "package:info_manager/mixins/i18n_mixin.dart";
+import "package:info_manager/store/app_state.dart";
 import "package:info_manager/service/shared_preference_service.dart";
 
 
@@ -11,13 +15,18 @@ class SettingView extends StatefulWidget {
 
 class _SettingViewState extends State<SettingView> with I18nMixin {
     bool isEnableDeleteFile = false;
+    bool isEnableFingerprintUnlock = false;
 
     @override
     void initState() {
         super.initState();
-        SharedPreferenceService.getIsEnableDeleteFile().then((value) {
-            setState(() {
-                this.isEnableDeleteFile = value;
+        SharedPreferenceService.getIsEnableDeleteFile().then((isEnableDeleteFile) {
+            SharedPreferenceService.getIsEnableFingerPrintUnlock().then((isEnableFingerprintUnlock) {
+                setState(() {
+                    this.isEnableDeleteFile = isEnableDeleteFile;
+                    this.isEnableFingerprintUnlock = isEnableFingerprintUnlock;
+                });
+
             });
         });
     }
@@ -56,10 +65,21 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
                                     ),
                                     new Switch(
                                         value: this.isEnableDeleteFile,
-                                        onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(context, currentValue)
+                                        onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(currentValue)
                                     ),
                                 ],
                             ),
+                            new Row(
+                                children: <Widget>[
+                                    new Expanded(
+                                        child: new Text(this.getI18nValue(context, "is_enable_fingerprint unlock"))
+                                    ),
+                                    new Switch(
+                                        value: this.isEnableFingerprintUnlock,
+                                        onChanged: (bool currentValue) => this.handleToggleFingerPrintUnlock(context, currentValue)
+                                    ),
+                                ],
+                            )
                         ],
                     ),
                 ),
@@ -67,10 +87,36 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
         );
     }
 
-    void handleToggleDeleteFileWhenPasswordError(BuildContext context, bool currentValue) async {
+    void handleToggleDeleteFileWhenPasswordError(bool currentValue) async {
         await SharedPreferenceService.setIsEnableDeleteFile(currentValue);
         setState(() {
             this.isEnableDeleteFile = currentValue;
         });
+    }
+
+    void handleToggleFingerPrintUnlock(BuildContext context, bool currentValue) async {
+        bool result = await SharedPreferenceService.setIsEnableFingerPrintUnlock(currentValue);
+
+        if (result) {
+            bool saveResult = false;
+            if (currentValue) {
+                Store<AppState> store = this.getStore(context);
+                saveResult = await SharedPreferenceService.setUserPassword(store.state.userInfo.getPassword());
+            } else {
+                saveResult = await SharedPreferenceService.removeUserPassword();
+            }
+
+            if (saveResult) {
+                setState(() {
+                    this.isEnableFingerprintUnlock = currentValue;
+                });
+            } else {
+                await SharedPreferenceService.setIsEnableFingerPrintUnlock(!currentValue);
+            }
+        }
+    }
+
+    Store<AppState> getStore(BuildContext context) {
+        return StoreProvider.of<AppState>(context);
     }
 }

@@ -50,9 +50,9 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                         List<PopupMenuItem<String>> menus = [];
 
                         menus.add(new PopupMenuItem(
-                            value: "category",
+                            value: "setting",
                             child: new Text(
-                                this.getI18nValue(context, "category")
+                                this.getI18nValue(context, "setting")
                             )
                         ));
 
@@ -60,8 +60,8 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                     },
                     onSelected: (String action) {
                         switch (action) {
-                            case "category":
-                                this.handleClickCategory(context);
+                            case "setting":
+                                this.handleClickSetting(context);
                                 break;
                             default:
                                 break;
@@ -215,11 +215,11 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                     ),
                     new IconButton(
                         icon: new Icon(
-                            Icons.settings,
+                            Icons.category,
                             size: 36.0,
                             color: Colors.white,
                         ),
-                        onPressed: () => this.handleClickSetting(context)
+                        onPressed: () => this.handleClickCategory(context)
                     )
                 ],
             ),

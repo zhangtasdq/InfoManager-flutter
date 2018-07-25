@@ -3,13 +3,13 @@ import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/service/shared_preference_service.dart";
 
 
-class Setting extends StatefulWidget {
+class SettingView extends StatefulWidget {
     @override
-    _SettingState createState() => new _SettingState();
+    _SettingViewState createState() => new _SettingViewState();
 
 }
 
-class _SettingState extends State<Setting> with I18nMixin {
+class _SettingViewState extends State<SettingView> with I18nMixin {
     bool isEnableDeleteFile = false;
 
     @override

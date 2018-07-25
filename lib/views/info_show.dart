@@ -9,19 +9,19 @@ import "package:info_manager/model/category.dart";
 import "package:info_manager/model/info_detail.dart";
 import "package:info_manager/views/info_edit.dart";
 
-class InfoShowPage extends StatefulWidget {
+class InfoShowView extends StatefulWidget {
     String infoId;
 
-    InfoShowPage(this.infoId);
+    InfoShowView(this.infoId);
 
-    _InfoShowPageState createState() => new _InfoShowPageState(this.infoId);
+    _InfoShowViewState createState() => new _InfoShowViewState(this.infoId);
 }
 
-class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
+class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
     List<String> showDetailHideValue = [];
     String infoId;
 
-    _InfoShowPageState(this.infoId);
+    _InfoShowViewState(this.infoId);
 
     @override
     Widget build(BuildContext context) {
@@ -195,7 +195,7 @@ class _InfoShowPageState extends State<InfoShowPage> with I18nMixin {
         Navigator.of(context).push(
             new MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoEditPage("edit", info.id);
+                    return new InfoEditView("edit", info.id);
                 }
             )
         );

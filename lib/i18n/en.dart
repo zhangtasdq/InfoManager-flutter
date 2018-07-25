@@ -43,5 +43,10 @@ const Map<String, String> EN = {
     "backup_info_failed": "Backup failed",
     "setting": "Setting",
     "delete_file_when_password_error_more_than_5_times": "delete file when password error more than 5 times",
-    "input_password_error_more_than_max_count": "Enter the password error too many times, will delete file"
+    "input_password_error_more_than_max_count": "Enter the password error too many times, will delete file",
+    "delete_category": "Delete category",
+    "category_list": "Category list",
+    "category_is_empty": "category is empty",
+    "confirm_delete_category": "Confirm delete category",
+    "category_is_not_empty_can_not_delete": "category is not empty, can not delete"
 };

@@ -15,24 +15,24 @@ import "package:info_manager/model/info_detail.dart";
 
 typedef void AddCategoryActionType(Category category);
 
-class InfoEditPage extends StatefulWidget {
+class InfoEditView extends StatefulWidget {
     final String viewAction;
     final String editInfoId;
 
-    InfoEditPage(this.viewAction, [this.editInfoId]);
+    InfoEditView(this.viewAction, [this.editInfoId]);
 
     @override
-    _InfoEditPageState createState() => new _InfoEditPageState(this.viewAction, this.editInfoId);
+    _InfoEditViewState createState() => new _InfoEditViewState(this.viewAction, this.editInfoId);
 }
 
-class _InfoEditPageState extends State<InfoEditPage> with I18nMixin {
+class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     bool _isInit = false;
     String _viewAction;
     String _editInfoId;
     Info _currentInfo;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
 
-    _InfoEditPageState(this._viewAction, [this._editInfoId]);
+    _InfoEditViewState(this._viewAction, [this._editInfoId]);
 
     @override
     Widget build(BuildContext context) {

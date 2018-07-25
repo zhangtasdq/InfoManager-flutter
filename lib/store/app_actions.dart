@@ -53,6 +53,12 @@ class AddCategoryAction {
     AddCategoryAction(this.category);
 }
 
+class DeleteCategoryAction {
+    final Category category;
+
+    DeleteCategoryAction(this.category);
+}
+
 class SetUserInfoAction {
     final UserInfo userInfo;
 

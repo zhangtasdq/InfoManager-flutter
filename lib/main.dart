@@ -15,6 +15,7 @@ import "package:info_manager/service/app_service.dart";
 import "package:info_manager/views/login.dart";
 import "package:info_manager/views/info_list.dart";
 import "package:info_manager/views/setting.dart";
+import "package:info_manager/views/category_list.dart";
 
 void main() {
     runApp(new InfoManager());
@@ -67,7 +68,7 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
                 home: Builder(
                     builder: (context) {
                         this.appContext = context;
-                        return new LoginPage();
+                        return new LoginView();
                     }
                 ),
                 localizationsDelegates: [
@@ -80,9 +81,10 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
                     const Locale("zh", "")
                 ],
                 routes: {
-                    "loginView": (BuildContext context) => new LoginPage(),
-                    "infoListView": (BuildContext context) => new InfoListPage(),
-                    "setting": (BuildContext context) => new Setting()
+                    "loginView": (BuildContext context) => new LoginView(),
+                    "infoListView": (BuildContext context) => new InfoListView(),
+                    "settingView": (BuildContext context) => new SettingView(),
+                    "categoryListView": (BuildContext context) => new CategoryListView()
                 },
             )
         );

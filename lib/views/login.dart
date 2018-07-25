@@ -14,12 +14,12 @@ import "package:info_manager/service/shared_preference_service.dart";
 
 typedef void SetPasswordActionType(String password);
 
-class LoginPage extends StatefulWidget {
+class LoginView extends StatefulWidget {
     @override
-    _LoginPageState createState() => new _LoginPageState();
+    _LoginViewState createState() => new _LoginViewState();
 }
 
-class _LoginPageState extends State<LoginPage> with I18nMixin {
+class _LoginViewState extends State<LoginView> with I18nMixin {
     String currentPassword;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
     int inputErrorCount = 0;

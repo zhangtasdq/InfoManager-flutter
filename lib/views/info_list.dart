@@ -13,11 +13,11 @@ import "package:info_manager/service/app_service.dart";
 import "package:info_manager/mixins/msg_mixin.dart";
 import "package:info_manager/configure/status_code.dart";
 
-class InfoListPage extends StatefulWidget {
-    _InfoListPageState createState() => new _InfoListPageState();
+class InfoListView extends StatefulWidget {
+    _InfoListViewState createState() => new _InfoListViewState();
 }
 
-class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
+class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     String currentCategoryId;
     bool isShowLoading = false;
 
@@ -31,7 +31,32 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
 
         return new Scaffold(
             appBar: new AppBar(
-                title: new Text(this.getI18nValue(context, "info_list"))
+                title: new Text(this.getI18nValue(context, "info_list")),
+                actions: <Widget>[
+                    new PopupMenuButton(
+                        itemBuilder: (BuildContext context) {
+                            List<PopupMenuItem<String>> menus = [];
+
+                            menus.add(new PopupMenuItem(
+                                value: "category",
+                                child: new Text(
+                                    this.getI18nValue(context, "category")
+                                )
+                            ));
+
+                            return menus;
+                        },
+                        onSelected: (String action) {
+                            switch (action) {
+                                case "category":
+                                    this.handleClickCategory(context);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        },
+                    )
+                ],
             ),
             drawer: this.buildDrawerLayout(context),
             body: this.buildBody(context),
@@ -199,7 +224,7 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
         Navigator.of(context).push(
             new MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoEditPage("create");
+                    return new InfoEditView("create");
                 }
             )
         );
@@ -307,14 +332,18 @@ class _InfoListPageState extends State<InfoListPage> with I18nMixin, MsgMixin {
         Navigator.of(context).push(
             new MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoShowPage(info.id);
+                    return new InfoShowView(info.id);
                 }
             )
         );
     }
 
     void handleClickSetting(BuildContext context) {
-        Navigator.of(context).pushNamed("setting");
+        Navigator.of(context).pushNamed("settingView");
+    }
+
+    void handleClickCategory(BuildContext context) {
+        Navigator.of(context).pushNamed("categoryListView");
     }
 
     List<Category> getAllCategories(BuildContext context) {

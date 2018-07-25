@@ -43,6 +43,11 @@ const Map<String, String> ZH = {
     "backup_info_failed": "备份失败",
     "setting": "设置",
     "delete_file_when_password_error_more_than_5_times": "当密码错误超过5次删除文件",
-    "input_password_error_more_than_max_count": "密码错误次数太多,将删除密码文件"
+    "input_password_error_more_than_max_count": "密码错误次数太多,将删除密码文件",
+    "category_list": "分类列表",
+    "category_is_empty": "分类为空",
+    "delete_category": "删除分类",
+    "confirm_delete_category": "确认删除分类?",
+    "category_is_not_empty_can_not_delete": "分类不为空,不能删除"
 
 };

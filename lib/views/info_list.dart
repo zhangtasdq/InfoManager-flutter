@@ -29,39 +29,46 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
             this.currentCategoryId = categoires[0].id;
         }
 
+        AppBar appBar = this.buildAppBar(context);
+        double appBarHeight = appBar.preferredSize.height;
+
         return new Scaffold(
-            appBar: new AppBar(
-                title: new Text(this.getI18nValue(context, "info_list")),
-                actions: <Widget>[
-                    new PopupMenuButton(
-                        itemBuilder: (BuildContext context) {
-                            List<PopupMenuItem<String>> menus = [];
-
-                            menus.add(new PopupMenuItem(
-                                value: "category",
-                                child: new Text(
-                                    this.getI18nValue(context, "category")
-                                )
-                            ));
-
-                            return menus;
-                        },
-                        onSelected: (String action) {
-                            switch (action) {
-                                case "category":
-                                    this.handleClickCategory(context);
-                                    break;
-                                default:
-                                    break;
-                            }
-                        },
-                    )
-                ],
-            ),
-            drawer: this.buildDrawerLayout(context),
+            appBar: appBar,
+            drawer: this.buildDrawerLayout(context, appBarHeight),
             body: this.buildBody(context),
             bottomNavigationBar: this.buildFooterTab(context),
             floatingActionButton: this.buildAddBtn(context)
+        );
+    }
+
+    AppBar buildAppBar(BuildContext context) {
+        return new AppBar(
+            title: new Text(this.getI18nValue(context, "info_list")),
+            actions: <Widget>[
+                new PopupMenuButton(
+                    itemBuilder: (BuildContext context) {
+                        List<PopupMenuItem<String>> menus = [];
+
+                        menus.add(new PopupMenuItem(
+                            value: "category",
+                            child: new Text(
+                                this.getI18nValue(context, "category")
+                            )
+                        ));
+
+                        return menus;
+                    },
+                    onSelected: (String action) {
+                        switch (action) {
+                            case "category":
+                                this.handleClickCategory(context);
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+                )
+            ],
         );
     }
 
@@ -112,37 +119,43 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
         );
     }
 
-    Widget buildDrawerLayout(BuildContext context) {
+    Widget buildDrawerLayout(BuildContext context, double appBarHeight) {
         return new StoreConnector<AppState, List<Category>>(
             converter: (store) {
                 return store.state.categories;
             },
             builder: (context, categories) {
                 List<Widget> contents = new List<Widget>();
-
-                Widget header = new DrawerHeader(
-                    child: new Center(
-                        child: new Text(
-                            this.getI18nValue(context, "category"),
-                            style: new TextStyle(
-                                color: Colors.white
-                            ),
-                        ),
-                    ),
-                    decoration: new BoxDecoration(
-                        color: Colors.blue
-                    ),
-                );
-
-                contents.add(header);
+                double statusBarHeight = MediaQuery.of(context).padding.top;
 
                 for (int i = 0, j = categories.length; i < j; ++i) {
                     contents.add(this.buildCategoryDrawerLayoutItem(context, categories[i]));
                 }
 
                 return new Drawer(
-                    child: new ListView(
-                        children: contents,
+                    child: new Column(
+                        children: <Widget>[
+                            new Container(
+                                margin: EdgeInsets.only(top: statusBarHeight),
+                                height: appBarHeight,
+                                color: Colors.blue,
+                                child: new Center(
+                                    child: new Text(
+                                        this.getI18nValue(context, "category"),
+                                        style: new TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 20.0
+                                        ),
+                                    ),
+                                ),
+                            ),
+                            new Expanded(
+                                child: new ListView(
+                                    padding: EdgeInsets.only(top: 0.0),
+                                    children: contents,
+                                )
+                            ),
+                        ],
                     ),
                 );
             },
@@ -157,7 +170,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
             onTap: () => this.handleChangeShowCategory(context, category),
             child: new Container(
                 color: isChecked ? Colors.blue : Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 10.0),
+                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
                 child: new Text(
                     category.name,
                     style: new TextStyle(

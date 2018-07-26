@@ -55,5 +55,6 @@ const Map<String, String> EN = {
     "auth_fingerprint": "Auth Fingerprint",
     "setting_fingureprint_desc": "please setting fingerprint",
     "fingerprint_not_recongnized": "fingerprint error",
-    "fingerprint_auth_success": "Fingerprint auth success"
+    "fingerprint_auth_success": "Fingerprint auth success",
+    "already_copied_to_clipboard": "Already copied to clipboard"
 };

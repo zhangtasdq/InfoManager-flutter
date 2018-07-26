@@ -1,6 +1,8 @@
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
+import "package:flutter/services.dart";
+import "package:fluttertoast/fluttertoast.dart";
 
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
@@ -116,6 +118,7 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
                 onTap: () {
                     this.handleTabHideDetailItem(item);
                 },
+                onLongPress: () => this.handleLongPressOnDetailItem(item),
                 child: new Container(
                     padding: EdgeInsets.only(top: 12.0, left: 12.0, bottom: 12.0),
                     child: new Column(
@@ -190,6 +193,13 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
                 this.showDetailHideValue.add(detail.id);
             });
         }
+    }
+
+    void handleLongPressOnDetailItem(InfoDetail detail) {
+        Clipboard.setData(new ClipboardData(text: detail.propertyValue));
+        Fluttertoast.showToast(
+            msg: this.getI18nValue(context, "already_copied_to_clipboard")
+        );
     }
 
     void handleTabEditInfo(BuildContext context, Info info) {

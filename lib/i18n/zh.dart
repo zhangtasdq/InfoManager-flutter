@@ -55,5 +55,6 @@ const Map<String, String> ZH = {
     "auth_fingerprint": "验证指纹",
     "setting_fingureprint_desc": "请设置指纹",
     "fingerprint_not_recongnized": "指纹错误",
-    "fingerprint_auth_success": "验证成功"
+    "fingerprint_auth_success": "验证成功",
+    "already_copied_to_clipboard": "已经复制到剪贴板"
 };

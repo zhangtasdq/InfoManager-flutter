@@ -5,6 +5,9 @@ import "package:flutter_redux/flutter_redux.dart";
 import "package:fluttertoast/fluttertoast.dart";
 import "package:local_auth/local_auth.dart";
 import "package:local_auth/auth_strings.dart";
+import "package:firebase_admob/firebase_admob.dart";
+
+import "../configure/app_configure.dart";
 
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_actions.dart";
@@ -27,6 +30,23 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     int inputErrorCount = 0;
     bool isEnableFingerPrintUnlock = false;
     bool isEnableDeleteFile = false;
+    BannerAd bannerAd;
+    bool isEnableAd = false;
+
+    static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+        testDevices: <String>[APP_CONFIGURE["AD_DEVICE_ID"]]
+    );
+
+    BannerAd createBannerAd() {
+        return new BannerAd(
+            adUnitId: APP_CONFIGURE["AD_MOB_AD_ID"],
+            targetingInfo: targetingInfo,
+            size: AdSize.smartBanner,
+            listener: (MobileAdEvent event) {
+                print(event.toString());
+            }
+        );
+    }
 
     @override
     void initState() {
@@ -40,6 +60,14 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                 });
             });
         });
+
+        if (this.isEnableAd) {
+            FirebaseAdMob.instance.initialize(appId: APP_CONFIGURE["AD_MOB_APP_ID"]);
+            bannerAd = createBannerAd()..load()..show(
+                anchorType: AnchorType.bottom,
+                anchorOffset: 0.0
+            );
+        }
     }
 
     @override
@@ -55,6 +83,12 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                 ],
             )
         );
+    }
+
+    @override
+    void dispose() {
+        bannerAd?.dispose();
+        super.dispose();
     }
 
     Widget _buildLoginPanel(BuildContext context) {

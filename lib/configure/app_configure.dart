@@ -7,5 +7,8 @@ const Map<String, dynamic> APP_CONFIGURE = {
     "ENCRYPT_SALT": "BzUN8mw4OlF*^cDWp^kfF!Au8LzJi6H6",
     "ONE_DRIVE_SCOPE": ["onedrive.appfolder"],
     "ONE_DRIVE_CLIENT_ID": "",
-    "ONE_DRIVE_CHANNEL_NAME": "cqmyg.asdq.infomanager.onedrive"
+    "ONE_DRIVE_CHANNEL_NAME": "cqmyg.asdq.infomanager.onedrive",
+    "AD_MOB_APP_ID": "",
+    "AD_MOB_AD_ID": "",
+    "AD_DEVICE_ID": ""
 };

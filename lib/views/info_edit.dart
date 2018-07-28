@@ -7,11 +7,12 @@ import "package:fluttertoast/fluttertoast.dart";
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/store/app_actions.dart";
 import "package:info_manager/util/uid.dart";
-import "package:info_manager/components/select.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/model/info.dart";
 import "package:info_manager/model/category.dart";
 import "package:info_manager/model/info_detail.dart";
+import "../components/category_select_list.dart";
+import "../components/add_category_dialog.dart";
 
 typedef void AddCategoryActionType(Category category);
 
@@ -31,8 +32,21 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     String _editInfoId;
     Info _currentInfo;
     GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+    TextEditingController _selectCategoryController;
 
     _InfoEditViewState(this._viewAction, [this._editInfoId]);
+
+    @override
+    void initState() {
+        super.initState();
+        this._selectCategoryController = TextEditingController();
+    }
+
+    @override
+    void dispose() {
+        this._selectCategoryController.dispose();
+        super.dispose();
+    }
 
     @override
     Widget build(BuildContext context) {
@@ -40,7 +54,6 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
             this.setInitData(context);
             this._isInit = true;
         }
-
         return new Scaffold(
             appBar: this.buildHeader(context),
             body: this.buildBody(context)
@@ -126,25 +139,21 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                             },
                             initialValue: this._currentInfo.title,
                         ),
-                        new StoreConnector<AppState, List<Category>>(
-                            converter: (store) {
-                                return store.state.categories;
-                            },
-                            builder: (context, categories) {
-                                return new Select(
-                                    label: this.getI18nValue(context, "category"),
-                                    datas: categories,
-                                    onPress: (String action, dynamic data) {
-                                        if (action == "checked") {
-                                            this.handleSelectCategory(context, data);
-                                        } else if (action == "add") {
-                                            this.handleCreateCategory(context);
-
-                                        }
-                                    },
-                                    checkedItem: this._currentInfo.categoryId,
-                                );
-                            },
+                        GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            child: TextFormField(
+                                controller: this._selectCategoryController,
+                                decoration: InputDecoration(
+                                    labelText: this.getI18nValue(context, "category"),
+                                    labelStyle: DefaultTextStyle.of(context).style,
+                                    enabled: false,
+                                    suffixIcon: Icon(
+                                        Icons.arrow_drop_down
+                                    )
+                                ),
+                            ),
+                            onTap: () => this.showCategorySelectDialog(context)
+                            
                         ),
                     ],
                 ),
@@ -265,6 +274,39 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
         }
     }
 
+    void showCategorySelectDialog(BuildContext context) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+                return AlertDialog(
+                    title: Container(
+                        child: Row(
+                            children: <Widget>[
+                                Expanded(
+                                    child: new Text(this.getI18nValue(context, "select_category")),
+                                ),
+                                IconButton(
+                                    icon: Icon(Icons.add, size: 32.0),
+                                    onPressed: () => this.handleCreateCategory(context),
+                                )
+                            ],
+                        ),
+                    ),
+                    content: Container(
+                        height: 300.0,
+                        child: CategorySelectList(
+                            checkedItem: this._currentInfo.categoryId,
+                            onPress: (dynamic item) {
+                                this.handleSelectCategory(context, item);
+                            },
+                        ),
+                    ),
+                );
+            }
+        );
+        
+    }
+
     void handleDeleteInfoDetailItem(int index) {
         setState(() {
             this._currentInfo.removeDetailItemByIndex(index);
@@ -273,73 +315,17 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
     void handleSelectCategory(BuildContext context, Category category) {
         setState(() {
+            this._selectCategoryController.text = category.name;
             this._currentInfo.categoryId = category.id;
         });
         Navigator.of(context).pop();
     }
 
     void handleCreateCategory(BuildContext context) {
-        GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-        String categoryName = "";
-
         showDialog(
             context: context,
             builder: (BuildContext context) {
-                return new AlertDialog(
-                    content: new Form(
-                        key: _formKey,
-                        child: new TextFormField(
-                            decoration: new InputDecoration(
-                                labelText: this.getI18nValue(context, "category_name"),
-                                hintText: this.getI18nValue(context, "please_input_category_name")
-                            ),
-                            validator: (value) {
-                                if (value.isEmpty) {
-                                    return this.getI18nValue(context, "please_input_category_name");
-                                }
-                            },
-
-                            onSaved: (value) {
-                                categoryName = value;
-                            },
-                        )
-                    ),
-                    actions: <Widget>[
-                        new RaisedButton(
-                            onPressed: () {
-                                Navigator.of(context).pop();
-                            },
-                            child: new Text(
-                                this.getI18nValue(context, "cancel")
-                            ),
-                        ),
-                        new StoreConnector<AppState, AddCategoryActionType>(
-                            converter: (store) {
-                                return (Category category) {
-                                    store.dispatch(new AddCategoryAction(category));
-                                };
-                            },
-                            builder: (context, addCategoryAction) {
-                                return new RaisedButton(
-                                    onPressed: () {
-                                        if (_formKey.currentState.validate()) {
-                                            _formKey.currentState.save();
-                                            Category item = new Category(Uid.generateUid(), categoryName);
-
-                                            addCategoryAction(item);
-                                            Navigator.of(context).pop();
-                                        }
-                                    },
-                                    child: new Text(
-                                        this.getI18nValue(context, "save")
-                                    ),
-                                );
-
-                            },
-                        ),
-                    ],
-                );
-
+                return AddCategoryDialog();
             }
         );
 

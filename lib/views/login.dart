@@ -31,7 +31,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     bool isEnableFingerPrintUnlock = false;
     bool isEnableDeleteFile = false;
     BannerAd bannerAd;
-    bool isEnableAd = false;
+    bool isEnableAd = true;
 
     static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
         testDevices: <String>[APP_CONFIGURE["AD_DEVICE_ID"]]

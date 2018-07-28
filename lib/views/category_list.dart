@@ -40,8 +40,8 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
 
             builder: (context, categories) {
                 if (categories.length == 0) {
-                    return new Center(
-                        child: new Text(this.getI18nValue(context, "category_is_empty")),
+                    return Center(
+                        child: Text(this.getI18nValue(context, "category_is_empty")),
                     );
                 }
 
@@ -50,12 +50,19 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
                     itemBuilder: (context, i) {
                         Category item = categories[i];
 
-                        return new ListTile(
-                            title: new Text(item.name),
-                            trailing: new IconButton(
-                                icon: new Icon(Icons.delete, color: Colors.red),
-                                onPressed: () => this.handleDeleteCategory(context, item)
-                            ),
+                        return Container(
+                            child: Column(
+                                children: <Widget>[
+                                    ListTile(
+                                        title: Text(item.name),
+                                        trailing: IconButton(
+                                            icon: Icon(Icons.delete, color: Colors.red),
+                                            onPressed: () => this.handleDeleteCategory(context, item)
+                                        ),
+                                    ),
+                                    Divider(height: 1.0,)
+                                ]
+                            )
                         );
                     }
                 );

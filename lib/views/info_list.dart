@@ -44,6 +44,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     AppBar buildAppBar(BuildContext context) {
         return new AppBar(
             title: new Text(this.getI18nValue(context, "info_list")),
+            /*
             actions: <Widget>[
                 new PopupMenuButton(
                     itemBuilder: (BuildContext context) {
@@ -69,6 +70,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                     },
                 )
             ],
+            */
         );
     }
 
@@ -93,8 +95,8 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                     }
                 }
                 if (infos.length == 0) {
-                    return new Center(
-                        child: new Text(this.getI18nValue(context, "info_is_empty")),
+                    return Center(
+                        child: Text(this.getI18nValue(context, "info_is_empty")),
                     );
                 }
 
@@ -103,9 +105,16 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                     itemBuilder: (context, i) {
                         Info item = infos[i];
 
-                        return new ListTile(
-                            title: new Text(item.title),
-                            onTap: () => this.handleClickInfoItem(context, item),
+                        return Container(
+                            child: Column(
+                                children: <Widget>[
+                                    ListTile(
+                                        title: Text(item.title),
+                                        onTap: () => this.handleClickInfoItem(context, item),
+                                    ),
+                                    Divider(height: 1.0,)
+                                ],
+                            ),
                         );
                     }
                 );
@@ -120,6 +129,8 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     }
 
     Widget buildDrawerLayout(BuildContext context, double appBarHeight) {
+        BuildContext topContext = context;
+
         return new StoreConnector<AppState, List<Category>>(
             converter: (store) {
                 return store.state.categories;
@@ -129,7 +140,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                 double statusBarHeight = MediaQuery.of(context).padding.top;
 
                 for (int i = 0, j = categories.length; i < j; ++i) {
-                    contents.add(this.buildCategoryDrawerLayoutItem(context, categories[i]));
+                    contents.add(this.buildCategoryDrawerLayoutItem(context, categories[i], i));
                 }
 
                 return new Drawer(
@@ -155,6 +166,21 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                                     children: contents,
                                 )
                             ),
+                            Container(
+                                height: appBarHeight,
+                                color: Colors.blue,
+                                child: Row(
+                                    children: <Widget>[
+                                        new IconButton(
+                                            icon: new Icon(Icons.settings, color: Colors.white,),
+                                            onPressed: () {
+                                                Navigator.of(context).pop();
+                                                this.handleClickSetting(topContext);
+                                            }
+                                        ),
+                                    ],
+                                )
+                            ),
                         ],
                     ),
                 );
@@ -163,19 +189,31 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
 
     }
 
-    Widget buildCategoryDrawerLayoutItem(BuildContext context, Category category) {
+    Widget buildCategoryDrawerLayoutItem(BuildContext context, Category category, int index) {
         bool isChecked = category.id == this.currentCategoryId;
+        List<Widget> children = <Widget>[];
+
+        if (index != 0) {
+            children.add(Divider(height: 1.0,));
+        }
+        children.add(Container(
+            color: isChecked ? Colors.lightBlue : Colors.white,
+            padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
+            child: Text(
+                category.name,
+                style: new TextStyle(
+                    color: isChecked ? Colors.white : Colors.black54
+                ),
+            ),
+
+        ));
 
         return new GestureDetector(
             onTap: () => this.handleChangeShowCategory(context, category),
-            child: new Container(
-                color: isChecked ? Colors.blue : Colors.white,
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
-                child: new Text(
-                    category.name,
-                    style: new TextStyle(
-                        color: isChecked ? Colors.white : Colors.black54
-                    ),
+            child: Container(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: children,
                 ),
             )
         );

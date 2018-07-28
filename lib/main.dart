@@ -82,7 +82,10 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
                 ],
                 routes: {
                     "loginView": (BuildContext context) => new LoginView(),
-                    "infoListView": (BuildContext context) => new InfoListView(),
+                    "infoListView": (BuildContext context) {
+                        this.appContext = context;
+                        return new InfoListView();
+                    },
                     "settingView": (BuildContext context) => new SettingView(),
                     "categoryListView": (BuildContext context) => new CategoryListView()
                 },

@@ -8,16 +8,15 @@ import "package:local_auth/auth_strings.dart";
 import "package:firebase_admob/firebase_admob.dart";
 
 import "../configure/app_configure.dart";
+import "../store/app_state.dart";
+import "../store/app_actions.dart";
+import "../mixins/i18n_mixin.dart";
+import "../service/user_service.dart";
+import "../service/app_service.dart";
+import "../service/hardware_service.dart";
+import "../service/shared_preference_service.dart";
+import "../types.dart";
 
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/store/app_actions.dart";
-
-import "package:info_manager/mixins/i18n_mixin.dart";
-import "package:info_manager/service/user_service.dart";
-import "package:info_manager/service/app_service.dart";
-import "package:info_manager/service/shared_preference_service.dart";
-
-typedef void SetPasswordActionType(String password);
 
 class LoginView extends StatefulWidget {
     @override
@@ -38,7 +37,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     );
 
     BannerAd createBannerAd() {
-        return new BannerAd(
+        return BannerAd(
             adUnitId: APP_CONFIGURE["AD_MOB_AD_ID"],
             targetingInfo: targetingInfo,
             size: AdSize.smartBanner,
@@ -54,9 +53,11 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
 
         SharedPreferenceService.getIsEnableDeleteFile().then((isEnableDeleteFile) {
             SharedPreferenceService.getIsEnableFingerPrintUnlock().then((isEnableFingerPrintUnlock) {
-                setState(() {
-                    this.isEnableDeleteFile = isEnableDeleteFile;
-                    this.isEnableFingerPrintUnlock = isEnableFingerPrintUnlock;
+                HardwareService.isSupportFingerPrint((error, {data}) {
+                    setState(() {
+                        this.isEnableDeleteFile = isEnableDeleteFile;
+                        this.isEnableFingerPrintUnlock = isEnableFingerPrintUnlock && error == null && data == true;
+                    });
                 });
             });
         });
@@ -72,11 +73,11 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
 
     @override
     Widget build(BuildContext context) {
-        return new Container(
+        return Container(
             color: Colors.white,
-            padding: EdgeInsets.only(top: 150.0, right: 10.0, left: 10.0),
+            padding: EdgeInsets.only(top: 150.0, right: 32.0, left: 32.0),
             height: 300.0,
-            child: new Column(
+            child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                     this._buildLoginPanel(context)
@@ -92,8 +93,8 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     }
 
     Widget _buildLoginPanel(BuildContext context) {
-        return new Card(
-            child: new Column(
+        return Card(
+            child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -105,13 +106,13 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     }
 
     Widget _buildHeader(BuildContext context) {
-        return new Container(
+        return Container(
             color: Colors.blue,
             padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-            child: new Text(
+            child: Text(
                 this.getI18nValue(context, "please_login"),
                 textAlign: TextAlign.left,
-                style: new TextStyle(
+                style: TextStyle(
                     color: Colors.white,
                     fontSize: 18.0
                 ),
@@ -120,11 +121,11 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
     }
 
     Widget _buildBody(BuildContext context) {
-        return new Container(
-            padding: EdgeInsets.fromLTRB(16.0, 20.0, 15.0, 40.0),
-            child: new Form(
+        return Container(
+            padding: EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 40.0),
+            child: Form(
                 key: _formKey,
-                child: new Column(
+                child: Column(
                     children: <Widget>[
                         TextFormField(
                             obscureText: true,
@@ -144,9 +145,9 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                             },
 
                         ),
-                        new Container(
+                        Container(
                             margin: EdgeInsets.only(top: 50.0),
-                            child: new StoreConnector<AppState, SetPasswordActionType>(
+                            child: StoreConnector<AppState, SetPasswordActionType>(
                                 converter: (store) {
                                     return (String password) {
                                         SetPasswordAction action = new SetPasswordAction(password);
@@ -158,10 +159,10 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                                     List<Widget> widgets = [];
 
                                     widgets.add(
-                                        new RaisedButton(
+                                        RaisedButton(
                                             color: Colors.blue,
                                             onPressed: () => this._handleLogin(context, updatePasswordAction),
-                                            child: new Text(
+                                            child: Text(
                                                 this.getI18nValue(context, "login"),
                                                 style: new TextStyle(
                                                     color: Colors.white
@@ -172,12 +173,12 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
 
                                     if (this.isEnableFingerPrintUnlock) {
                                         widgets.add(
-                                            new RaisedButton(
+                                            RaisedButton(
                                                 color: Colors.teal,
                                                 onPressed: () => this.handleFingerLogin(context, updatePasswordAction),
-                                                child: new Text(
+                                                child: Text(
                                                     this.getI18nValue(context, "fingerprint"),
-                                                    style: new TextStyle(
+                                                    style: TextStyle(
                                                         color: Colors.white
                                                     )
                                                 ),
@@ -185,7 +186,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                                         );
                                     }
 
-                                    return new Row(
+                                    return Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
                                         children: widgets,
                                     );

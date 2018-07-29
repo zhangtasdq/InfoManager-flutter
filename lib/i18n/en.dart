@@ -56,5 +56,7 @@ const Map<String, String> EN = {
     "setting_fingureprint_desc": "please setting fingerprint",
     "fingerprint_not_recongnized": "fingerprint error",
     "fingerprint_auth_success": "Fingerprint auth success",
-    "already_copied_to_clipboard": "Already copied to clipboard"
+    "already_copied_to_clipboard": "Already copied to clipboard",
+    "system_error": "System error",
+    "confirm_enable_fingerprint_msg": "if enable fingerprint, will save your password in local, may cause securitty problems, is enable?"
 };

@@ -5,6 +5,8 @@ import "package:flutter/material.dart";
 import "package:info_manager/mixins/i18n_mixin.dart";
 import "package:info_manager/store/app_state.dart";
 import "package:info_manager/service/shared_preference_service.dart";
+import "../service/hardware_service.dart";
+import "../mixins/msg_mixin.dart";
 
 
 class SettingView extends StatefulWidget {
@@ -13,9 +15,10 @@ class SettingView extends StatefulWidget {
 
 }
 
-class _SettingViewState extends State<SettingView> with I18nMixin {
+class _SettingViewState extends State<SettingView> with I18nMixin, MsgMixin {
     bool isEnableDeleteFile = false;
     bool isEnableFingerprintUnlock = false;
+    bool isShowFingerprintUnlock;
 
     @override
     void initState() {
@@ -29,10 +32,22 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
 
             });
         });
+
     }
 
     @override
     Widget build(BuildContext context) {
+        if (this.isShowFingerprintUnlock == null) {
+            HardwareService.isSupportFingerPrint((error, {data}) {
+                if (error != null){
+                    this.showToast(this.getI18nValue(context, "system_error"));
+                } else {
+                    setState(() {
+                        this.isShowFingerprintUnlock = data;
+                    });
+                }
+            });
+        }
         return new Scaffold(
             appBar: new AppBar(
                 title: new Text(this.getI18nValue(context, "setting")),
@@ -40,7 +55,7 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
             body: this.buildBody(context),
         );
     }
-    
+
     Widget buildBody(BuildContext context) {
         return new Container(
             child: new Column(
@@ -50,37 +65,47 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
             ),
         );
     }
-    
+
     Widget buildCommonSection(BuildContext context) {
+        List<Widget> widgets = <Widget>[];
+
+        widgets.add(
+            Row(
+                children: <Widget>[
+                    Expanded(
+                        child: Text(this.getI18nValue(context, "delete_file_when_password_error_more_than_5_times"))
+                    ),
+                    Switch(
+                        value: this.isEnableDeleteFile,
+                        onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(currentValue)
+                    ),
+                ],
+            ),
+        );
+
+        if (this.isShowFingerprintUnlock == true) {
+            widgets.add(
+                Row(
+                    children: <Widget>[
+                        Expanded(
+                            child: Text(this.getI18nValue(context, "is_enable_fingerprint unlock"))
+                        ),
+                        Switch(
+                            value: this.isEnableFingerprintUnlock,
+                            onChanged: (bool currentValue) => this.handleToggleFingerPrintUnlock(context, currentValue)
+                        ),
+                    ],
+                )
+
+            );
+        }
+
         return new Container(
-            child: new Card(
-                child: new Container(
+            child: Card(
+                child: Container(
                     padding: EdgeInsets.all(10.0),
-                    child: new Column(
-                        children: <Widget>[
-                            new Row(
-                                children: <Widget>[
-                                    new Expanded(
-                                        child: new Text(this.getI18nValue(context, "delete_file_when_password_error_more_than_5_times"))
-                                    ),
-                                    new Switch(
-                                        value: this.isEnableDeleteFile,
-                                        onChanged: (bool currentValue) => this.handleToggleDeleteFileWhenPasswordError(currentValue)
-                                    ),
-                                ],
-                            ),
-                            new Row(
-                                children: <Widget>[
-                                    new Expanded(
-                                        child: new Text(this.getI18nValue(context, "is_enable_fingerprint unlock"))
-                                    ),
-                                    new Switch(
-                                        value: this.isEnableFingerprintUnlock,
-                                        onChanged: (bool currentValue) => this.handleToggleFingerPrintUnlock(context, currentValue)
-                                    ),
-                                ],
-                            )
-                        ],
+                    child: Column(
+                        children: widgets
                     ),
                 ),
             )
@@ -95,6 +120,36 @@ class _SettingViewState extends State<SettingView> with I18nMixin {
     }
 
     void handleToggleFingerPrintUnlock(BuildContext context, bool currentValue) async {
+        BuildContext topContext = context;
+        if (currentValue == true) {
+            showDialog(
+                context: context,
+                builder: (context) {
+                    return AlertDialog(
+                        content: Text(this.getI18nValue(context, "confirm_enable_fingerprint_msg")),
+                        actions: <Widget>[
+                            RaisedButton(
+                                child: Text(this.getI18nValue(context, "cancel")),
+                                onPressed: () => Navigator.of(context).pop()
+                            ),
+                            RaisedButton(
+                                child: Text(this.getI18nValue(context, "confirm")),
+                                onPressed: () {
+                                    Navigator.of(context).pop();
+                                    this.toggleEnableFingerPrintValue(topContext, currentValue);
+                                },
+                            )
+                        ],
+                    );
+                }
+            );
+
+        } else {
+            this.toggleEnableFingerPrintValue(context, currentValue);
+        }
+    }
+
+    void toggleEnableFingerPrintValue(BuildContext context, bool currentValue) async {
         bool result = await SharedPreferenceService.setIsEnableFingerPrintUnlock(currentValue);
 
         if (result) {

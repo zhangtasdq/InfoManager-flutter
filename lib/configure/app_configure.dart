@@ -8,6 +8,7 @@ const Map<String, dynamic> APP_CONFIGURE = {
     "ONE_DRIVE_SCOPE": ["onedrive.appfolder"],
     "ONE_DRIVE_CLIENT_ID": "",
     "ONE_DRIVE_CHANNEL_NAME": "cqmyg.asdq.infomanager.onedrive",
+    "HARDWARE_CHANNEL_NAME": "cqmyg.asdq.infomanager.hardware",
     "AD_MOB_APP_ID": "",
     "AD_MOB_AD_ID": "",
     "AD_DEVICE_ID": ""

@@ -12,10 +12,7 @@ class CategorySelectList extends StatefulWidget {
 
     CategorySelectList({this.checkedItem, this.onPress});
 
-    _SelectListState createState() => new _SelectListState(
-        checkedItem: checkedItem,
-        onPress: onPress
-    );
+    _SelectListState createState() => _SelectListState(checkedItem: checkedItem, onPress: onPress);
 }
 
 class _SelectListState extends State<CategorySelectList> {
@@ -23,19 +20,16 @@ class _SelectListState extends State<CategorySelectList> {
     OnPressSelectSurface onPress;
 
 
-    _SelectListState({
-        this.checkedItem,
-        this.onPress
-    });
+    _SelectListState({this.checkedItem, this.onPress});
 
     @override
     Widget build(BuildContext context) {
         return SingleChildScrollView(
-            child: new StoreConnector<AppState, List<Category>>(
+            child: StoreConnector<AppState, List<Category>>(
                 converter: (store) => store.state.categories,
                 builder: (context,datas) {
                     return ListBody(
-                        children: this.buildSelectItems(context, datas),
+                        children: buildSelectItems(context, datas),
                     );
                 },
             ),
@@ -43,23 +37,17 @@ class _SelectListState extends State<CategorySelectList> {
     }
 
     List<Widget> buildSelectItems(BuildContext context, List<Category> categories) {
-        List<Widget> items = [];
-
-        for (int i = 0, j = categories.length; i < j; ++i) {
-            items.add(this.buildSelectIem(context, categories[i]));
-        }
-
-        return items;
+        return categories.map((category) => buildSelectItem(context, category));
     }
 
-    Widget buildSelectIem(BuildContext context, dynamic item) {
+    Widget buildSelectItem(BuildContext context, dynamic item) {
         Icon icon = item.id == checkedItem ? Icon(Icons.radio_button_checked, color: Colors.blue,) :
-                                              Icon(Icons.radio_button_unchecked);
+                                             Icon(Icons.radio_button_unchecked);
         return ListTile(
             key: Key(item.id),
             title: Text(item.name),
             trailing: icon,
-            onTap: () => this.handleClickItem(item)
+            onTap: () => handleClickItem(item)
         );
     }
 

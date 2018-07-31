@@ -4,13 +4,11 @@ class Category {
 
     Category(this.id, this.name);
 
+    Map<String, dynamic> get saveData => toJson();
+
     Category.fromJson(Map<String, dynamic> json):
         id = json["id"],
         name = json["name"];
-
-    Map<String, dynamic> getSaveData() {
-        return this.toJson();
-    }
 
     @override
     String toString() {

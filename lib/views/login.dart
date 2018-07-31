@@ -1,4 +1,5 @@
 import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
@@ -11,28 +12,28 @@ import "../configure/app_configure.dart";
 import "../store/app_state.dart";
 import "../store/app_actions.dart";
 import "../mixins/i18n_mixin.dart";
+import "../mixins/msg_mixin.dart";
 import "../service/user_service.dart";
 import "../service/app_service.dart";
 import "../service/hardware_service.dart";
 import "../service/shared_preference_service.dart";
 import "../types.dart";
 
-
 class LoginView extends StatefulWidget {
     @override
-    _LoginViewState createState() => new _LoginViewState();
+    _LoginViewState createState() => _LoginViewState();
 }
 
-class _LoginViewState extends State<LoginView> with I18nMixin {
-    String currentPassword;
-    GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-    int inputErrorCount = 0;
-    bool isEnableFingerPrintUnlock = false;
-    bool isEnableDeleteFile = false;
-    BannerAd bannerAd;
-    bool isEnableAd = true;
+class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
+    String _currentPassword;
+    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+    int _inputErrorCount = 0;
+    bool _isEnableFingerPrintUnlock = false;
+    bool _isEnableDeleteFile = false;
+    BannerAd _bannerAd;
+    bool _isEnableAd = true;
 
-    static final MobileAdTargetingInfo targetingInfo = new MobileAdTargetingInfo(
+    static final MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
         testDevices: <String>[APP_CONFIGURE["AD_DEVICE_ID"]]
     );
 
@@ -40,10 +41,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
         return BannerAd(
             adUnitId: APP_CONFIGURE["AD_MOB_AD_ID"],
             targetingInfo: targetingInfo,
-            size: AdSize.smartBanner,
-            listener: (MobileAdEvent event) {
-                print(event.toString());
-            }
+            size: AdSize.smartBanner
         );
     }
 
@@ -55,16 +53,16 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
             SharedPreferenceService.getIsEnableFingerPrintUnlock().then((isEnableFingerPrintUnlock) {
                 HardwareService.isSupportFingerPrint((error, {data}) {
                     setState(() {
-                        this.isEnableDeleteFile = isEnableDeleteFile;
-                        this.isEnableFingerPrintUnlock = isEnableFingerPrintUnlock && error == null && data == true;
+                        _isEnableDeleteFile = isEnableDeleteFile;
+                        _isEnableFingerPrintUnlock = isEnableFingerPrintUnlock && error == null && data == true;
                     });
                 });
             });
         });
 
-        if (this.isEnableAd) {
+        if (_isEnableAd) {
             FirebaseAdMob.instance.initialize(appId: APP_CONFIGURE["AD_MOB_APP_ID"]);
-            bannerAd = createBannerAd()..load()..show(
+            _bannerAd = createBannerAd()..load()..show(
                 anchorType: AnchorType.bottom,
                 anchorOffset: 0.0
             );
@@ -80,7 +78,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
             child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                    this._buildLoginPanel(context)
+                    _buildLoginPanel(context)
                 ],
             )
         );
@@ -88,7 +86,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
 
     @override
     void dispose() {
-        bannerAd?.dispose();
+        _bannerAd?.dispose();
         super.dispose();
     }
 
@@ -98,8 +96,8 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                    this._buildHeader(context),
-                    this._buildBody(context)
+                    _buildHeader(context),
+                    _buildBody(context)
                 ],
             ),
         );
@@ -110,7 +108,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
             color: Colors.blue,
             padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
             child: Text(
-                this.getI18nValue(context, "please_login"),
+                getI18nValue(context, "please_login"),
                 textAlign: TextAlign.left,
                 style: TextStyle(
                     color: Colors.white,
@@ -129,19 +127,18 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                     children: <Widget>[
                         TextFormField(
                             obscureText: true,
-                            decoration: new InputDecoration(
-
-                                labelText: this.getI18nValue(context, "password"),
-                                hintText: this.getI18nValue(context, "please_input_password"),
+                            decoration: InputDecoration(
+                                labelText: getI18nValue(context, "password"),
+                                hintText: getI18nValue(context, "please_input_password"),
                             ),
                             validator: (value) {
                                 if (value.isEmpty) {
-                                    return this.getI18nValue(context, "please_input_password");
+                                    return getI18nValue(context, "please_input_password");
                                 }
                             },
 
                             onSaved: (value) {
-                                this.currentPassword = value;
+                                _currentPassword = value;
                             },
 
                         ),
@@ -150,7 +147,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                             child: StoreConnector<AppState, SetPasswordActionType>(
                                 converter: (store) {
                                     return (String password) {
-                                        SetPasswordAction action = new SetPasswordAction(password);
+                                        SetPasswordAction action = SetPasswordAction(password);
 
                                         store.dispatch(action);
                                     };
@@ -158,33 +155,34 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
                                 builder: (context, updatePasswordAction) {
                                     List<Widget> widgets = [];
 
-                                    widgets.add(
-                                        RaisedButton(
-                                            color: Colors.blue,
-                                            onPressed: () => this._handleLogin(context, updatePasswordAction),
-                                            child: Text(
-                                                this.getI18nValue(context, "login"),
-                                                style: new TextStyle(
-                                                    color: Colors.white
-                                                )
-                                            ),
-                                        )
-                                    );
 
-                                    if (this.isEnableFingerPrintUnlock) {
+                                   if (_isEnableFingerPrintUnlock) {
                                         widgets.add(
                                             RaisedButton(
-                                                color: Colors.teal,
-                                                onPressed: () => this.handleFingerLogin(context, updatePasswordAction),
+                                                color: Colors.blueAccent,
+                                                onPressed: () => handleFingerLogin(context, updatePasswordAction),
                                                 child: Text(
-                                                    this.getI18nValue(context, "fingerprint"),
+                                                    getI18nValue(context, "fingerprint"),
                                                     style: TextStyle(
                                                         color: Colors.white
                                                     )
                                                 ),
                                             )
                                         );
-                                    }
+                                   }
+
+                                    widgets.add(
+                                        RaisedButton(
+                                            color: Colors.blue,
+                                            onPressed: () => _handleLogin(context, updatePasswordAction),
+                                            child: Text(
+                                                getI18nValue(context, "login"),
+                                                style: TextStyle(
+                                                    color: Colors.white
+                                                )
+                                            ),
+                                        )
+                                    );
 
                                     return Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -201,80 +199,93 @@ class _LoginViewState extends State<LoginView> with I18nMixin {
 
 
     void _handleLogin(BuildContext context, SetPasswordActionType updatePasswordAction) async {
-        if (this._formKey.currentState.validate()) {
-            this._formKey.currentState.save();
+        if (_formKey.currentState.validate()) {
+            _formKey.currentState.save();
 
-            bool loginSuccess = await UserService.login(this.currentPassword);
+            bool loginSuccess = await UserService.login(_currentPassword);
 
             if (loginSuccess) {
-                this.handleLoginSuccess(context, this.currentPassword, updatePasswordAction);
+                handleLoginSuccess(context, _currentPassword, updatePasswordAction);
             } else {
-                await this.handlePasswordError();
+                await handlePasswordError();
             }
         }
     }
 
     void handleFingerLogin(BuildContext context, SetPasswordActionType updatePasswordAction) async {
-        var localAuth = new LocalAuthentication();
+        var localAuth = LocalAuthentication();
+
         dynamic androidStrings = AndroidAuthMessages(
-            cancelButton: this.getI18nValue(context, "cancel"),
-            goToSettingsButton: this.getI18nValue(context, "setting"),
-            goToSettingsDescription: this.getI18nValue(context, "setting_fingureprint_desc"),
-            fingerprintNotRecognized: this.getI18nValue(context, "fingerprint_not_recongnized"),
-            signInTitle: this.getI18nValue(context, "auth_fingerprint"),
-            fingerprintSuccess: this.getI18nValue(context, "fingerprint_auth_success")
+            cancelButton: getI18nValue(context, "cancel"),
+            goToSettingsButton: getI18nValue(context, "setting"),
+            goToSettingsDescription: getI18nValue(context, "setting_fingureprint_desc"),
+            fingerprintNotRecognized: getI18nValue(context, "fingerprint_not_recongnized"),
+            signInTitle: getI18nValue(context, "auth_fingerprint"),
+            fingerprintSuccess: getI18nValue(context, "fingerprint_auth_success")
         );
 
-        bool didAuthenticate = await localAuth.authenticateWithBiometrics(
-            localizedReason: this.getI18nValue(context, "please_auth_fingerprint"),
-            androidAuthStrings: androidStrings,
-            useErrorDialogs: false
-        );
+        try {
+            bool didAuthenticate = await localAuth.authenticateWithBiometrics(
+                localizedReason: this.getI18nValue(context, "please_auth_fingerprint"),
+                androidAuthStrings: androidStrings,
+                useErrorDialogs: false
+            );
 
-        if (didAuthenticate) {
-            String password = await SharedPreferenceService.getUserPassword();
-            this.handleLoginSuccess(context, password, updatePasswordAction);
-        } else {
-            await this.handlePasswordError();
+            if (didAuthenticate) {
+                String password = await SharedPreferenceService.getUserPassword();
+                handleLoginSuccess(context, password, updatePasswordAction);
+            } else {
+                await handlePasswordError();
+            }
+        } catch(e) {
+            Fluttertoast.showToast(
+                msg: getI18nValue(context, "fingerprint_system_error")
+            );
         }
 
     }
 
     Future<Null> handlePasswordError() async {
-        if (this.isEnableDeleteFile) {
-            this.inputErrorCount++;
+        if (_isEnableDeleteFile) {
+            _inputErrorCount++;
         }
 
-        if (this.inputErrorCount == this.getErrorPasswordMaxCount(context)) {
+        if (_inputErrorCount == getErrorPasswordMaxCount(context)) {
             Fluttertoast.showToast(
-                msg: this.getI18nValue(context, "input_password_error_more_than_max_count")
+                msg: getI18nValue(context, "input_password_error_more_than_max_count")
             );
             await AppService.deleteFile();
         } else {
             Fluttertoast.showToast(
-                msg: this.getI18nValue(context, "password_is_error")
+                msg: getI18nValue(context, "password_is_error")
             );
         }
 
         return null;
     }
 
-    void handleLoginSuccess(BuildContext context, String password, SetPasswordActionType updatePasswordAction) async {
+    void handleLoginSuccess(BuildContext context, String password,
+                            SetPasswordActionType updatePasswordAction) {
+
         updatePasswordAction(password);
 
 
         Store<AppState> store = StoreProvider.of<AppState>(context);
-        await AppService.loadAppStateData(store);
 
-
-        new Future.delayed(new Duration(milliseconds: 100), () {
-            store.dispatch(new SetListenStoreStatusAction(true));
+        AppService.loadAppStateData(store, (error, {dynamic data}) {
+            if (error != null) {
+                this.showToast(getI18nValue(context, "load_data_error"));
+            } else {
+                new Future.delayed(Duration(milliseconds: 100), () {
+                    store.dispatch(SetListenStoreStatusAction(true));
+                });
+                Navigator.pushReplacementNamed(context, "infoListView");
+            }
         });
-        Navigator.pushReplacementNamed(context, "infoListView");
     }
 
     int getErrorPasswordMaxCount(BuildContext context) {
-        Store<AppState> store = this.getStore(context);
+        Store<AppState> store = getStore(context);
 
         return store.state.userInfo.maxErrorCount;
     }

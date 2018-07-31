@@ -58,5 +58,10 @@ const Map<String, String> ZH = {
     "fingerprint_auth_success": "验证成功",
     "already_copied_to_clipboard": "已经复制到剪贴板",
     "system_error": "系统错误,请稍候重试",
-    "confirm_enable_fingerprint_msg": "如果启用指纹解锁,将会将你的密码保存到本地,可能会导致安全问题.是否启用?"
+    "confirm_enable_fingerprint_msg": "如果启用指纹解锁,将会将你的密码保存到本地,可能会导致安全问题.是否启用?",
+    "fingerprint_system_error": "指纹验证错误,请尝试密码解锁",
+    "restore_failed_by_password": "密码不正确,还原失败",
+    "load_file_content_failed": "加载文件内容失败，请稍候重试",
+    "download_file_error": "下载文件，请稍候重试",
+    "load_data_error": "加载数据失败，请稍候重试"
 };

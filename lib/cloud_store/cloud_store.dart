@@ -1,7 +1,7 @@
-typedef void StoreCallback(dynamic error, {dynamic data});
+import "../types.dart";
 
 abstract class CloudStore {
-    isFileExists(String fileName, StoreCallback callback);
-    saveFile(String fileName, String content, StoreCallback callback);
-    downloadFile(String fileName, StoreCallback callback);
+    isFileExists(String fileName, AsyncCallback callback);
+    saveFile(String fileName, String content, AsyncCallback callback);
+    downloadFile(String fileName, AsyncCallback callback);
 }

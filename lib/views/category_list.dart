@@ -2,40 +2,36 @@ import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
-import "package:info_manager/model/category.dart";
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/mixins/i18n_mixin.dart";
-import "package:info_manager/mixins/msg_mixin.dart";
-import "package:info_manager/util/uid.dart";
-
+import "../model/category.dart";
+import "../store/app_state.dart";
+import "../store/app_actions.dart";
+import "../mixins/i18n_mixin.dart";
+import "../mixins/msg_mixin.dart";
 import "../components/add_category_dialog.dart";
 
-typedef void AddCategoryActionType(Category category);
-
 class CategoryListView extends StatefulWidget {
-    _CategoryListViewState createState() => new _CategoryListViewState();
+    _CategoryListViewState createState() => _CategoryListViewState();
 }
 
 class _CategoryListViewState extends State<CategoryListView> with I18nMixin, MsgMixin {
     @override
     Widget build(BuildContext context) {
-        return new Scaffold(
-            appBar: new AppBar(
-                title: new Text(this.getI18nValue(context, "category_list")),
+        return Scaffold(
+            appBar: AppBar(
+                title: Text(getI18nValue(context, "category_list")),
                 actions: <Widget>[
-                    new IconButton(
-                        icon: new Icon(Icons.add, color: Colors.white),
-                        onPressed: () => this.handleAddCategory(context)
+                    IconButton(
+                        icon: Icon(Icons.add, color: Colors.white),
+                        onPressed: () => handleAddCategory(context)
                     )
                 ],
             ),
-            body: this.buildBody(context)
+            body: buildBody(context)
         );
     }
 
     Widget buildBody(BuildContext context) {
-        return new StoreConnector<AppState, List<Category>>(
+        return StoreConnector<AppState, List<Category>>(
             converter: (store) {
                 return store.state.categories;
             },
@@ -43,11 +39,11 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
             builder: (context, categories) {
                 if (categories.length == 0) {
                     return Center(
-                        child: Text(this.getI18nValue(context, "category_is_empty")),
+                        child: Text(getI18nValue(context, "category_is_empty")),
                     );
                 }
 
-                return new ListView.builder(
+                return ListView.builder(
                     itemCount: categories.length,
                     itemBuilder: (context, i) {
                         Category item = categories[i];
@@ -59,7 +55,7 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
                                         title: Text(item.name),
                                         trailing: IconButton(
                                             icon: Icon(Icons.delete, color: Colors.red),
-                                            onPressed: () => this.handleDeleteCategory(context, item)
+                                            onPressed: () => handleDeleteCategory(context, item)
                                         ),
                                     ),
                                     Divider(height: 1.0,)
@@ -73,8 +69,8 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
     }
 
     Widget buildLoading(BuildContext context) {
-        return new Center(
-            child: new CircularProgressIndicator(),
+        return Center(
+            child: CircularProgressIndicator(),
         );
     }
     
@@ -93,19 +89,19 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
         showDialog(
             context: context,
             builder: (BuildContext context) {
-                return new AlertDialog(
-                    title: new Text(this.getI18nValue(context, "delete_category")),
-                    content: new Text(this.getI18nValue(context, "confirm_delete_category")),
+                return AlertDialog(
+                    title: Text(getI18nValue(context, "delete_category")),
+                    content: Text(getI18nValue(context, "confirm_delete_category")),
                     actions: <Widget>[
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "cancel")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "cancel")),
                             onPressed: () => Navigator.of(context).pop()
                         ),
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "confirm")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "confirm")),
                             onPressed: () {
                                 Navigator.of(context).pop();
-                                this.executeDeleteCategory(topContext, category);
+                                executeDeleteCategory(topContext, category);
                             }
                         )
                     ],
@@ -115,8 +111,8 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
     }
 
     void executeDeleteCategory(BuildContext context, Category category) {
-        Store<AppState> store = this.getStore(context);
-        DeleteCategoryAction action = new DeleteCategoryAction(category);
+        Store<AppState> store = getStore(context);
+        DeleteCategoryAction action = DeleteCategoryAction(category);
         store.dispatch(action);
     }
 

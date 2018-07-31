@@ -1,29 +1,28 @@
 import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 import "package:fluttertoast/fluttertoast.dart";
 
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/util/uid.dart";
-import "package:info_manager/mixins/i18n_mixin.dart";
-import "package:info_manager/model/info.dart";
-import "package:info_manager/model/category.dart";
-import "package:info_manager/model/info_detail.dart";
+import "../store/app_state.dart";
+import "../store/app_actions.dart";
+import "../util/uid.dart";
+import "../mixins/i18n_mixin.dart";
+import "../model/info.dart";
+import "../model/category.dart";
+import "../model/info_detail.dart";
 import "../components/category_select_list.dart";
 import "../components/add_category_dialog.dart";
 
-typedef void AddCategoryActionType(Category category);
-
 class InfoEditView extends StatefulWidget {
-    final String viewAction;
-    final String editInfoId;
+    final String _viewAction;
+    final String _editInfoId;
 
-    InfoEditView(this.viewAction, [this.editInfoId]);
+    InfoEditView(this._viewAction, [this._editInfoId]);
 
     @override
-    _InfoEditViewState createState() => new _InfoEditViewState(this.viewAction, this.editInfoId);
+    _InfoEditViewState createState() => _InfoEditViewState(this._viewAction, this._editInfoId);
 }
 
 class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
@@ -31,7 +30,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     String _viewAction;
     String _editInfoId;
     Info _currentInfo;
-    GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+    GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     TextEditingController _selectCategoryController;
 
     _InfoEditViewState(this._viewAction, [this._editInfoId]);
@@ -39,75 +38,75 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     @override
     void initState() {
         super.initState();
-        this._selectCategoryController = TextEditingController();
+        _selectCategoryController = TextEditingController();
     }
 
     @override
     void dispose() {
-        this._selectCategoryController.dispose();
+        _selectCategoryController.dispose();
         super.dispose();
     }
 
     @override
     Widget build(BuildContext context) {
-        if (this._isInit == false) {
-            this.setInitData(context);
-            this._isInit = true;
+        if (_isInit == false) {
+            setInitData(context);
+            _isInit = true;
         }
-        return new Scaffold(
-            appBar: this.buildHeader(context),
-            body: this.buildBody(context)
+        return Scaffold(
+            appBar: buildHeader(context),
+            body: buildBody(context)
         );
     }
 
     Widget buildHeader(BuildContext context) {
-        List<Widget> actions = new List();
+        List<Widget> actions = [];
 
-        if (this.isEdit()) {
+        if (isEdit()) {
             actions.add(
-                new IconButton(
-                    icon: new Icon(
+                IconButton(
+                    icon: Icon(
                         Icons.delete,
                         color: Colors.white
                     ),
-                    onPressed: () => this.handleClickDelete(context)
+                    onPressed: () => handleClickDelete(context)
                 )
             );
         }
 
         actions.add(
-            new IconButton(
-                icon: new Icon(
+            IconButton(
+                icon: Icon(
                     Icons.save,
                     color: Colors.white
                 ),
-                onPressed: () => this.handleClickSave(context)
+                onPressed: () => handleClickSave(context)
             )
         );
 
-        return new AppBar(
-            title: new Text(this.getTitleStr(context)),
+        return AppBar(
+            title: Text(getTitleStr(context)),
             actions: actions,
         );
     }
 
     Widget buildBody(BuildContext context) {
-        return new Container(
+        return Container(
             padding: EdgeInsets.only(bottom: 10.0, top: 10.0, left: 10.0, right: 10.0),
-            child: new Form(
+            child: Form(
                 key: _formKey,
-                child: new ListView.builder(
-                    itemCount: this.getListItemCount(),
+                child: ListView.builder(
+                    itemCount: getListItemCount(),
                     itemBuilder: (context, i) {
                         if (i == 0) {
-                            return this.buildMainInfoItem(context);
+                            return buildMainInfoItem(context);
                         }
 
-                        if (this.getListItemCount() - 1 == i ) {
-                            return this.buildAddBtn(context);
+                        if (getListItemCount() - 1 == i ) {
+                            return buildAddBtn(context);
                         }
 
-                        return this.buildInfoDetailItem(context, i);
+                        return buildInfoDetailItem(context, i);
                     }
                 )
             ),
@@ -115,36 +114,36 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     }
 
     int getListItemCount() {
-        return this._currentInfo.getDetailCount() + 2;
+        return _currentInfo.detailCount + 2;
     }
 
     Widget buildMainInfoItem(BuildContext context) {
-        return new Card(
-            child: new Container(
+        return Card(
+            child: Container(
                 padding: EdgeInsets.all(10.0),
-                child: new Column(
+                child: Column(
                     children: <Widget>[
                         TextFormField(
-                            decoration: new InputDecoration(
-                                labelText: this.getI18nValue(context, "title"),
-                                hintText: this.getI18nValue(context, "please_input_title"),
+                            decoration: InputDecoration(
+                                labelText: getI18nValue(context, "title"),
+                                hintText: getI18nValue(context, "please_input_title"),
                             ),
                             validator: (value) {
                                 if (value.isEmpty) {
-                                    return this.getI18nValue(context, "title_can_not_empty");
+                                    return getI18nValue(context, "title_can_not_empty");
                                 }
                             },
                             onSaved: (value) {
-                                this._currentInfo.setTitle(value);
+                                _currentInfo.setTitle(value);
                             },
-                            initialValue: this._currentInfo.title,
+                            initialValue: _currentInfo.title,
                         ),
                         GestureDetector(
                             behavior: HitTestBehavior.opaque,
                             child: TextFormField(
-                                controller: this._selectCategoryController,
+                                controller: _selectCategoryController,
                                 decoration: InputDecoration(
-                                    labelText: this.getI18nValue(context, "category"),
+                                    labelText: getI18nValue(context, "category"),
                                     labelStyle: DefaultTextStyle.of(context).style,
                                     enabled: false,
                                     suffixIcon: Icon(
@@ -152,8 +151,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                                     )
                                 ),
                             ),
-                            onTap: () => this.showCategorySelectDialog(context)
-                            
+                            onTap: () => showCategorySelectDialog(context)
                         ),
                     ],
                 ),
@@ -163,32 +161,32 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
     Widget buildInfoDetailItem(BuildContext context, int index) {
         int detailIndex = index - 1;
-        InfoDetail item = this._currentInfo.findDetailByIndex(detailIndex);
+        InfoDetail item = _currentInfo.findDetailByIndex(detailIndex);
 
-        return new Card(
-            child: new Container(
+        return Card(
+            child: Container(
                 padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
-                child: new Stack(children: <Widget>[
-                    new Positioned(
-                        child: new IconButton(
-                            icon: new Icon(Icons.close, color: Colors.red,),
-                            onPressed: () => this.handleDeleteInfoDetailItem(detailIndex)
+                child: Stack(children: <Widget>[
+                    Positioned(
+                        child: IconButton(
+                            icon: Icon(Icons.close, color: Colors.red,),
+                            onPressed: () => handleDeleteInfoDetailItem(detailIndex)
                         ),
                         top: 0.0,
                         right: 0.0,
                     ),
-                    new Container(
+                    Container(
                         margin: EdgeInsets.only(top: 25.0),
-                        child: new Column(
+                        child: Column(
                             children: <Widget>[
                                 TextFormField(
-                                    decoration: new InputDecoration(
-                                        labelText: this.getI18nValue(context, "property"),
-                                        hintText: this.getI18nValue(context, "please_input_property"),
+                                    decoration: InputDecoration(
+                                        labelText: getI18nValue(context, "property"),
+                                        hintText: getI18nValue(context, "please_input_property"),
                                     ),
                                     validator: (value) {
                                         if (value.isEmpty) {
-                                            return this.getI18nValue(context, "property_can_not_empty");
+                                            return getI18nValue(context, "property_can_not_empty");
                                         }
                                     },
                                     onSaved: (value) {
@@ -198,17 +196,17 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
                                 ),
 
-                                new Row(
+                                Row(
                                     children: <Widget>[
-                                        new Expanded(
-                                            child: new TextFormField(
-                                                decoration: new InputDecoration(
-                                                    labelText: this.getI18nValue(context, "content"),
-                                                    hintText: this.getI18nValue(context, "please_input_content"),
+                                        Expanded(
+                                            child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    labelText: getI18nValue(context, "content"),
+                                                    hintText: getI18nValue(context, "please_input_content"),
                                                 ),
                                                 validator: (value) {
                                                     if (value.isEmpty) {
-                                                        return this.getI18nValue(context, "content_can_not_empty");
+                                                        return getI18nValue(context, "content_can_not_empty");
                                                     }
                                                 },
                                                 onSaved: (value) {
@@ -217,35 +215,34 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                                                 initialValue: item.propertyValue,
                                             ),
                                         ),
-                                        new Padding(
+                                        Padding(
                                             padding: EdgeInsets.only(top: 35.0),
-                                            child: new Checkbox(
-                                                value: item.isHide(),
-                                                onChanged: (bool checked) => this.handleClickHideCheckbox(item, checked)
+                                            child: Checkbox(
+                                                value: item.hide,
+                                                onChanged: (bool checked) => handleClickHideCheckbox(item, checked)
                                             ),
                                         ),
-                                        new Padding(
+                                        Padding(
                                             padding: EdgeInsets.only(top: 35.0),
-                                            child: new Text(this.getI18nValue(context, "hide"))
+                                            child: Text(getI18nValue(context, "hide"))
                                         )
                                     ],
                                 )
                             ],
                         ),
                     ),
-
                 ],),
             ),
         );
     }
 
     Widget buildAddBtn(BuildContext context) {
-        return new Container(
+        return Container(
             margin: EdgeInsets.only(top: 30.0),
-            child: new RaisedButton(
-                onPressed: this.handleClickAddDetailItem,
+            child: RaisedButton(
+                onPressed: handleClickAddDetailItem,
                 padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: new Icon(
+                child: Icon(
                     Icons.add,
                     size: 30.0,
                     color: Colors.blue,
@@ -255,22 +252,25 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     }
 
     String getTitleStr(BuildContext context) {
-        if (this.isEdit()) {
-            return this.getI18nValue(context, "edit_info");
+        if (isEdit()) {
+            return getI18nValue(context, "edit_info");
         }
-        return this.getI18nValue(context, "create_info");
+        return getI18nValue(context, "create_info");
 
     }
 
     bool isEdit() {
-        return this._viewAction == "edit";
+        return _viewAction == "edit";
     }
 
     void setInitData(BuildContext context) {
-        if (this.isEdit()) {
-            this._currentInfo = this.getCurrentInfo(context).clone();
+        if (isEdit()) {
+            Category category = getCurrentCategory(context);
+
+            _currentInfo = getCurrentInfo(context).clone();
+            _selectCategoryController.text = category.name;
         } else {
-            this._currentInfo = new Info(Uid.generateUid(), "", "", []);
+            _currentInfo = Info(Uid.generateUid(), "", "", []);
         }
     }
 
@@ -283,11 +283,11 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                         child: Row(
                             children: <Widget>[
                                 Expanded(
-                                    child: new Text(this.getI18nValue(context, "select_category")),
+                                    child: Text(getI18nValue(context, "select_category")),
                                 ),
                                 IconButton(
                                     icon: Icon(Icons.add, size: 32.0),
-                                    onPressed: () => this.handleCreateCategory(context),
+                                    onPressed: () => handleCreateCategory(context),
                                 )
                             ],
                         ),
@@ -295,28 +295,27 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                     content: Container(
                         height: 300.0,
                         child: CategorySelectList(
-                            checkedItem: this._currentInfo.categoryId,
+                            checkedItem: _currentInfo.categoryId,
                             onPress: (dynamic item) {
-                                this.handleSelectCategory(context, item);
+                                handleSelectCategory(context, item);
                             },
                         ),
                     ),
                 );
             }
         );
-        
     }
 
     void handleDeleteInfoDetailItem(int index) {
         setState(() {
-            this._currentInfo.removeDetailItemByIndex(index);
+            _currentInfo.removeDetailItemByIndex(index);
         });
     }
 
     void handleSelectCategory(BuildContext context, Category category) {
         setState(() {
-            this._selectCategoryController.text = category.name;
-            this._currentInfo.categoryId = category.id;
+            _selectCategoryController.text = category.name;
+            _currentInfo.categoryId = category.id;
         });
         Navigator.of(context).pop();
     }
@@ -328,7 +327,6 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                 return AddCategoryDialog();
             }
         );
-
     }
 
     void handleClickHideCheckbox(InfoDetail item, bool checked) {
@@ -339,15 +337,16 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
     void handleClickAddDetailItem() {
         setState(() {
-            this._currentInfo.addEmptyDetailItem();
+            _formKey.currentState.save();
+            _currentInfo.addEmptyDetailItem();
         });
     }
 
 
     void handleClickSave(BuildContext context) {
-        if (this._currentInfo.categoryId.isEmpty) {
+        if (_currentInfo.categoryId.isEmpty) {
             Fluttertoast.showToast(
-                msg: this.getI18nValue(context, "category_can_not_empty")
+                msg: getI18nValue(context, "category_can_not_empty")
             );
             return;
         }
@@ -358,13 +357,13 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
             dynamic action;
 
             if (this.isEdit()) {
-                action = new UpdateInfoAction(this._currentInfo);
+                action = UpdateInfoAction(_currentInfo);
             } else {
-                action = new AddInfoAction(this._currentInfo);
+                action = AddInfoAction(_currentInfo);
             }
             store.dispatch(action);
 
-            new Future.delayed(new Duration(milliseconds: 1200), () {
+            Future.delayed(Duration(milliseconds: 1200), () {
                 Navigator.pop(context);
             });
         }
@@ -374,18 +373,18 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
         showDialog(
             context: context,
             builder: (BuildContext context) {
-                return new AlertDialog(
-                    title: new Text(this.getI18nValue(context, "delete_info")),
-                    content: new Text(this.getI18nValue(context, "is_delete_info")),
+                return AlertDialog(
+                    title: Text(getI18nValue(context, "delete_info")),
+                    content: Text(getI18nValue(context, "is_delete_info")),
                     actions: <Widget>[
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "cancel")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "cancel")),
                             onPressed: () => Navigator.of(context).pop()
                         ),
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "confirm")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "confirm")),
                             onPressed: () {
-                                this.executeDeleteInfo(context);
+                                executeDeleteInfo(context);
                             }
                         )
                     ],
@@ -395,32 +394,33 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
     }
 
     void executeDeleteInfo(BuildContext context) {
-        Store<AppState> store = this.getStore(context);
+        Store<AppState> store = getStore(context);
 
-        DeleteInfoAction action = new DeleteInfoAction(this._currentInfo);
+        DeleteInfoAction action = DeleteInfoAction(this._currentInfo);
 
         store.dispatch(action);
 
-        new Future.delayed(new Duration(milliseconds: 1000), () {
+        Future.delayed(Duration(milliseconds: 1000), () {
             Navigator.of(context).pushNamedAndRemoveUntil("infoListView", (Route<dynamic> route) => false);
         });
+    }
+
+    Category getCurrentCategory(BuildContext context) {
+        Store<AppState> store = this.getStore(context);
+        List<Category> categories = store.state.categories;
+        Info info = this.getCurrentInfo(context);
+
+        return categories.firstWhere((item) => item.id == info.categoryId, orElse: () => null);
     }
 
     Info getCurrentInfo(BuildContext context) {
         Store<AppState> store = this.getStore(context);
         List<Info> infos = store.state.infos;
 
-        for (int i = 0, j = infos.length; i < j; ++i) {
-            if (infos[i].id == this._editInfoId) {
-                return infos[i];
-            }
-        }
-        return null;
+        return infos.firstWhere((item) => item.id == _editInfoId, orElse: () => null);
     }
 
     Store<AppState> getStore(BuildContext context) {
         return StoreProvider.of<AppState>(context);
     }
-
-
 }

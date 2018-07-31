@@ -1,9 +1,10 @@
 import "dart:async";
+
 import "package:flutter/material.dart";
 import "package:flutter/foundation.dart" show SynchronousFuture;
 
-import "package:info_manager/i18n/zh.dart";
-import "package:info_manager/i18n/en.dart";
+import "../i18n/zh.dart";
+import "../i18n/en.dart";
 
 class InfoManagerLocalizations {
     final Locale locale;
@@ -21,7 +22,10 @@ class InfoManagerLocalizations {
 
 
     String getI18nValue(String key) {
-        return _localizedValues[locale.languageCode][key];
+        if (_localizedValues.containsKey(locale.languageCode)) {
+            return _localizedValues[locale.languageCode][key];
+        }
+        return _localizedValues["en"][key];
     }
 }
 

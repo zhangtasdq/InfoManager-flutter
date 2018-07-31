@@ -1,10 +1,12 @@
 import "dart:async";
+
 import "package:shared_preferences/shared_preferences.dart";
 
-import "package:info_manager/configure/app_configure.dart";
+import "../configure/app_configure.dart";
 
 class SharedPreferenceService {
     static SharedPreferences _instance;
+
     static Future<SharedPreferences> getInstance() async {
         if (_instance == null) {
             _instance = await SharedPreferences.getInstance();
@@ -45,7 +47,6 @@ class SharedPreferenceService {
         return result;
     }
 
-
     static Future<bool> setIsEnableDeleteFile(bool isEnable) async {
         SharedPreferences sharedPreferences = await getInstance();
 
@@ -69,7 +70,5 @@ class SharedPreferenceService {
         SharedPreferences sharedPreferences = await getInstance();
 
         return sharedPreferences.remove(APP_CONFIGURE["USER_PASSWORD_KEY"]);
-
     }
-
 }

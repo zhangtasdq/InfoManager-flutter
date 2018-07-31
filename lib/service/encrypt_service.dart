@@ -1,8 +1,9 @@
-import "package:flutter_string_encryption/flutter_string_encryption.dart";
 import "dart:async";
 
-import "package:info_manager/configure/app_configure.dart";
-import "package:info_manager/util/password_padding.dart" show passwordPadding;
+import "package:flutter_string_encryption/flutter_string_encryption.dart";
+
+import "../configure/app_configure.dart";
+import "../util/password_padding.dart" show passwordPadding;
 
 class EncryptService {
     static Future<String> encryptStr(String password, String content) async {

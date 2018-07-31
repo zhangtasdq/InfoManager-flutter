@@ -1,7 +1,7 @@
 import "package:redux/redux.dart";
 
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/model/info.dart";
+import "../store/app_actions.dart";
+import "../model/info.dart";
 
 final infosReducer = combineReducers<List<Info>>([
     new TypedReducer<List<Info>, AddInfoAction>(_addInfo),
@@ -32,16 +32,11 @@ List<Info> _updateInfo(List<Info> infos, UpdateInfoAction action) {
 
 List<Info> _deleteInfo(List<Info> infos, DeleteInfoAction action) {
     List<Info> copy = List.from(infos);
-    Info removeInfo;
+    Info removeInfo = copy.firstWhere((item) => item.id == action.info.id, orElse: () => null);
 
-    for(int i = 0, j = copy.length; i < j; ++i) {
-        if (copy[i].id == action.info.id) {
-            removeInfo = copy[i];
-            break;
-        }
+    if (removeInfo != null) {
+        copy.remove(removeInfo);
     }
-
-    copy.remove(removeInfo);
 
     return copy;
 }

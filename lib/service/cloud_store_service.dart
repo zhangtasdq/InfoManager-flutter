@@ -1,11 +1,11 @@
-import "package:info_manager/cloud_store/cloud_store.dart";
-import "package:info_manager/cloud_store/one_drive_store.dart";
+import "../cloud_store/cloud_store.dart";
+import "../cloud_store/one_drive_store.dart";
+import "../types.dart";
 
 class CloudStoreService {
     static CloudStore oneDriveStore = new OneDriveStore();
 
-
-    static isFileExists(String fileName, StoreCallback callback,
+    static isFileExists(String fileName, AsyncCallback callback,
         {String saveType = "oneDrive"}) {
         CloudStore store;
         if (saveType == "oneDrive") {
@@ -17,7 +17,7 @@ class CloudStoreService {
         }
     }
 
-    static saveFile(String fileName, String content, StoreCallback callback,
+    static saveFile(String fileName, String content, AsyncCallback callback,
         {String saveType = "oneDrive"}) {
 
         CloudStore store;
@@ -28,7 +28,7 @@ class CloudStoreService {
         store.saveFile(fileName, content, callback);
     }
 
-    static downloadFile(String fileName, StoreCallback callback,
+    static downloadFile(String fileName, AsyncCallback callback,
         {String saveType = "oneDrive"}) {
 
         CloudStore store;

@@ -4,23 +4,19 @@ class UserInfo {
 
     UserInfo({this.password = ""});
 
+    Map<String, dynamic> get saveData {
+        return {
+            "maxErrorCount": maxErrorCount
+        };
+    }
+
     UserInfo.fromJson(Map<String, dynamic> json):
         password = json["password"],
         maxErrorCount = json["maxErrorCount"];
 
 
     clone() {
-        return new UserInfo(password: this.password);
-    }
-
-    String getPassword() {
-        return password;
-    }
-
-    Map<String, dynamic> getSaveData() {
-        return {
-            "maxErrorCount": maxErrorCount
-        };
+        return UserInfo(password: this.password);
     }
 
     @override

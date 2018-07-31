@@ -1,7 +1,6 @@
-import "package:info_manager/model/info.dart";
-import "package:info_manager/model/category.dart";
-import "package:info_manager/model/user_info.dart";
-
+import "../model/info.dart";
+import "../model/category.dart";
+import "../model/user_info.dart";
 
 class ResetAppAction {
 }
@@ -27,7 +26,6 @@ class DeleteInfoAction {
     final Info info;
     DeleteInfoAction(this.info);
 }
-
 
 class SetPasswordAction {
     final String password;

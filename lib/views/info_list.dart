@@ -2,166 +2,147 @@ import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
-import "package:info_manager/model/info.dart";
-import "package:info_manager/model/category.dart";
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/mixins/i18n_mixin.dart";
-import "package:info_manager/views/info_edit.dart";
-import "package:info_manager/views/info_show.dart";
-import "package:info_manager/service/app_service.dart";
-import "package:info_manager/mixins/msg_mixin.dart";
-import "package:info_manager/configure/status_code.dart";
+import "../model/info.dart";
+import "../model/category.dart";
+import "../store/app_state.dart";
+import "../store/app_actions.dart";
+import "../mixins/i18n_mixin.dart";
+import "../mixins/msg_mixin.dart";
+import "../views/info_edit.dart";
+import "../views/info_show.dart";
+import "../service/app_service.dart";
+import "../configure/status_code.dart";
 
 class InfoListView extends StatefulWidget {
-    _InfoListViewState createState() => new _InfoListViewState();
+    _InfoListViewState createState() => _InfoListViewState();
 }
 
 class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
-    String currentCategoryId;
-    bool isShowLoading = false;
+    String _currentCategoryId;
+    bool _isShowLoading = false;
 
     @override
     Widget build(BuildContext context) {
-        List<Category> categoires = this.getAllCategories(context);
-
-        if (this.currentCategoryId == null && categoires.length > 0) {
-            this.currentCategoryId = categoires[0].id;
-        }
-
-        AppBar appBar = this.buildAppBar(context);
+        AppBar appBar = buildAppBar(context);
         double appBarHeight = appBar.preferredSize.height;
 
-        return new Scaffold(
+        return Scaffold(
             appBar: appBar,
-            drawer: this.buildDrawerLayout(context, appBarHeight),
-            body: this.buildBody(context),
-            bottomNavigationBar: this.buildFooterTab(context),
-            floatingActionButton: this.buildAddBtn(context)
+            drawer: buildDrawerLayout(context, appBarHeight),
+            body: buildBody(context),
+            bottomNavigationBar: buildFooterTab(context),
+            floatingActionButton: buildAddBtn(context)
         );
     }
 
     AppBar buildAppBar(BuildContext context) {
-        return new AppBar(
-            title: new Text(this.getI18nValue(context, "info_list")),
-            /*
-            actions: <Widget>[
-                new PopupMenuButton(
-                    itemBuilder: (BuildContext context) {
-                        List<PopupMenuItem<String>> menus = [];
-
-                        menus.add(new PopupMenuItem(
-                            value: "setting",
-                            child: new Text(
-                                this.getI18nValue(context, "setting")
-                            )
-                        ));
-
-                        return menus;
-                    },
-                    onSelected: (String action) {
-                        switch (action) {
-                            case "setting":
-                                this.handleClickSetting(context);
-                                break;
-                            default:
-                                break;
-                        }
-                    },
-                )
-            ],
-            */
+        return AppBar(
+            title: Text(getI18nValue(context, "info_list")),
         );
     }
 
     Widget buildBody(BuildContext context) {
-        return new StoreConnector<AppState, List<Info>>(
+        return StoreConnector<AppState, List<Info>>(
             converter: (store) {
                 return store.state.infos;
             },
 
             builder: (context, stateInfos) {
-                if (this.isShowLoading) {
-                    return this.buildLoading(context);
-                }
-
                 List<Info> infos = [];
+                List<Widget> children = <Widget>[];
 
-                if (this.currentCategoryId != null && stateInfos.length > 0) {
-                    for (int i = 0, j = stateInfos.length; i < j; ++i) {
-                        if (stateInfos[i].categoryId == this.currentCategoryId) {
-                            infos.add(stateInfos[i]);
-                        }
+                if (!isContainCategoryById(context, _currentCategoryId)) {
+                    List<Category> categories = getAllCategories(context);
+                    if (categories.length > 0) {
+                        _currentCategoryId = categories[0].id;
                     }
                 }
+
+                if (_currentCategoryId != null && stateInfos.length > 0) {
+                    stateInfos.forEach((item) {
+                        if (item.categoryId == _currentCategoryId) {
+                            infos.add(item);
+                        }
+                    });
+                }
+
                 if (infos.length == 0) {
-                    return Center(
-                        child: Text(this.getI18nValue(context, "info_is_empty")),
+                    children.add(Center(
+                        child: Text(getI18nValue(context, "info_is_empty")),
+                    ));
+                } else {
+                    children.add(
+                        ListView.builder(
+                            itemCount: infos.length,
+                            itemBuilder: (context, i) {
+                                Info item = infos[i];
+
+                                return Container(
+                                    child: Column(
+                                        children: <Widget>[
+                                            ListTile(
+                                                title: Text(item.title),
+                                                onTap: () => handleClickInfoItem(context, item),
+                                            ),
+                                            Divider(height: 1.0,)
+                                        ],
+                                    ),
+                                );
+                            }
+                        )
                     );
                 }
 
-                return new ListView.builder(
-                    itemCount: infos.length,
-                    itemBuilder: (context, i) {
-                        Info item = infos[i];
+                if (_isShowLoading) {
+                    children.add(buildLoading(context));
+                }
 
-                        return Container(
-                            child: Column(
-                                children: <Widget>[
-                                    ListTile(
-                                        title: Text(item.title),
-                                        onTap: () => this.handleClickInfoItem(context, item),
-                                    ),
-                                    Divider(height: 1.0,)
-                                ],
-                            ),
-                        );
-                    }
-                );
+                return Stack(children: children);
+
             },
         );
     }
 
     Widget buildLoading(BuildContext context) {
-        return new Center(
-            child: new CircularProgressIndicator(),
+        return Center(
+            child: CircularProgressIndicator(),
         );
     }
 
     Widget buildDrawerLayout(BuildContext context, double appBarHeight) {
         BuildContext topContext = context;
 
-        return new StoreConnector<AppState, List<Category>>(
+        return StoreConnector<AppState, List<Category>>(
             converter: (store) {
                 return store.state.categories;
             },
             builder: (context, categories) {
-                List<Widget> contents = new List<Widget>();
+                List<Widget> contents = [];
                 double statusBarHeight = MediaQuery.of(context).padding.top;
-
+                
                 for (int i = 0, j = categories.length; i < j; ++i) {
-                    contents.add(this.buildCategoryDrawerLayoutItem(context, categories[i], i));
+                    contents.add(buildCategoryDrawerLayoutItem(context, categories[i], i));
                 }
 
-                return new Drawer(
-                    child: new Column(
+                return Drawer(
+                    child: Column(
                         children: <Widget>[
-                            new Container(
+                            Container(
                                 margin: EdgeInsets.only(top: statusBarHeight),
                                 height: appBarHeight,
                                 color: Colors.blue,
-                                child: new Center(
-                                    child: new Text(
-                                        this.getI18nValue(context, "category"),
-                                        style: new TextStyle(
+                                child: Center(
+                                    child: Text(
+                                        getI18nValue(context, "category"),
+                                        style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 20.0
                                         ),
                                     ),
                                 ),
                             ),
-                            new Expanded(
-                                child: new ListView(
+                            Expanded(
+                                child: ListView(
                                     padding: EdgeInsets.only(top: 0.0),
                                     children: contents,
                                 )
@@ -171,11 +152,11 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                                 color: Colors.blue,
                                 child: Row(
                                     children: <Widget>[
-                                        new IconButton(
-                                            icon: new Icon(Icons.settings, color: Colors.white,),
+                                        IconButton(
+                                            icon: Icon(Icons.settings, color: Colors.white,),
                                             onPressed: () {
                                                 Navigator.of(context).pop();
-                                                this.handleClickSetting(topContext);
+                                                handleClickSetting(topContext);
                                             }
                                         ),
                                     ],
@@ -190,26 +171,26 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     }
 
     Widget buildCategoryDrawerLayoutItem(BuildContext context, Category category, int index) {
-        bool isChecked = category.id == this.currentCategoryId;
-        List<Widget> children = <Widget>[];
+        bool isChecked = category.id == _currentCategoryId;
+        List<Widget> children = [];
 
         if (index != 0) {
             children.add(Divider(height: 1.0,));
         }
+
         children.add(Container(
             color: isChecked ? Colors.lightBlue : Colors.white,
             padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
             child: Text(
                 category.name,
-                style: new TextStyle(
+                style: TextStyle(
                     color: isChecked ? Colors.white : Colors.black54
                 ),
             ),
-
         ));
 
-        return new GestureDetector(
-            onTap: () => this.handleChangeShowCategory(context, category),
+        return GestureDetector(
+            onTap: () => handleChangeShowCategory(context, category),
             child: Container(
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -218,46 +199,46 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
             )
         );
     }
-    
+
     void handleChangeShowCategory(BuildContext context, Category category) {
-        if (this.currentCategoryId != category.id) {
+        if (_currentCategoryId != category.id) {
             setState(() {
-                this.currentCategoryId = category.id;
+                _currentCategoryId = category.id;
             });
         }
         Navigator.of(context).pop();
     }
 
     Widget buildFooterTab(BuildContext context) {
-        return new Container(
+        return Container(
             color: Colors.blue,
-            child: new Row(
+            child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                    new IconButton(
+                    IconButton(
                         color: Colors.white,
-                        icon: new Icon(
+                        icon: Icon(
                             Icons.cloud_upload,
                             size: 36.0,
                             color: Colors.white
                         ),
-                        onPressed: () => this.handleBackupInfo(context)
+                        onPressed: () => handleBackupInfo(context)
                     ),
-                    new IconButton(
-                        icon: new Icon(
+                    IconButton(
+                        icon: Icon(
                             Icons.cloud_download,
                             size: 36.0,
                             color: Colors.white
                         ),
-                        onPressed: () => this.handleRestoreInfo(context)
+                        onPressed: () => handleRestoreInfo(context)
                     ),
-                    new IconButton(
-                        icon: new Icon(
+                    IconButton(
+                        icon: Icon(
                             Icons.category,
                             size: 36.0,
                             color: Colors.white,
                         ),
-                        onPressed: () => this.handleClickCategory(context)
+                        onPressed: () => handleClickCategory(context)
                     )
                 ],
             ),
@@ -265,17 +246,17 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     }
 
     Widget buildAddBtn(BuildContext context) {
-        return new FloatingActionButton(
-            onPressed: () => this.showEditPage(context),
-            child: new Icon(Icons.add),
+        return FloatingActionButton(
+            onPressed: () => showEditPage(context),
+            child: Icon(Icons.add),
         );
     }
 
     void showEditPage(context) {
         Navigator.of(context).push(
-            new MaterialPageRoute(
+            MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoEditView("create");
+                    return InfoEditView("create");
                 }
             )
         );
@@ -287,19 +268,19 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
         showDialog(
             context: context,
             builder: (BuildContext context) {
-                return new AlertDialog(
-                    title: new Text(this.getI18nValue(context, "backup_info")),
-                    content: new Text(this.getI18nValue(context, "confirm_backup_info")),
+                return AlertDialog(
+                    title: Text(getI18nValue(context, "backup_info")),
+                    content: Text(getI18nValue(context, "confirm_backup_info")),
                     actions: <Widget>[
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "cancel")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "cancel")),
                             onPressed: () => Navigator.of(context).pop()
                         ),
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "confirm")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "confirm")),
                             onPressed: () {
                                 Navigator.of(context).pop();
-                                this.executeBackupInfo(topContext);
+                                executeBackupInfo(topContext);
                             }
                         )
                     ],
@@ -310,16 +291,16 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
 
     void executeBackupInfo(BuildContext context) {
         setState(() {
-            isShowLoading = true;
+            _isShowLoading = true;
         });
         AppService.backupInfo((dynamic error, {dynamic data}) {
             if (error != null) {
-                this.showToast(this.getI18nValue(context, "backup_info_failed"));
+                showToast(getI18nValue(context, "backup_info_failed"));
             } else if (data != null) {
-                this.showToast(this.getI18nValue(context, "backup_info_success"));
+                showToast(getI18nValue(context, "backup_info_success"));
             }
             setState(() {
-                isShowLoading = false;
+                _isShowLoading = false;
             });
         });
     }
@@ -329,19 +310,19 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
         showDialog(
             context: context,
             builder: (BuildContext context) {
-                return new AlertDialog(
-                    title: new Text(this.getI18nValue(context, "restore_info")),
-                    content: new Text(this.getI18nValue(context, "confirm_restore_info")),
+                return AlertDialog(
+                    title: Text(getI18nValue(context, "restore_info")),
+                    content: Text(getI18nValue(context, "confirm_restore_info")),
                     actions: <Widget>[
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "cancel")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "cancel")),
                             onPressed: () => Navigator.of(context).pop()
                         ),
-                        new RaisedButton(
-                            child: new Text(this.getI18nValue(context, "confirm")),
+                        RaisedButton(
+                            child: Text(getI18nValue(context, "confirm")),
                             onPressed: () {
                                 Navigator.of(context).pop();
-                                this.executeRestoreInfo(topContext);
+                                executeRestoreInfo(topContext);
                             }
                         )
                     ],
@@ -351,39 +332,46 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
     }
 
     void executeRestoreInfo(BuildContext context) {
-        Store<AppState> store = this.getStore(context);
-        SetListenStoreStatusAction action = new SetListenStoreStatusAction(false);
+        Store<AppState> store = getStore(context);
+        SetListenStoreStatusAction action = SetListenStoreStatusAction(false);
         store.dispatch(action);
 
-
         setState(() {
-            isShowLoading = true;
+            _isShowLoading = true;
         });
 
-        AppService.restoreInfo(store, (error, [statusCode]) {
+        AppService.restoreInfo(store, (error, {dynamic data}) {
             if (error != null) {
-                this.showToast(this.getI18nValue(context, "restore_info_failed"));
-            } else {
-                if (statusCode == StatusCode.FILE_NOT_EXIST) {
-                    this.showToast(this.getI18nValue(context, "file_not_exist"));
-                } else {
-                    this.showToast(this.getI18nValue(context, "restore_info_success"));
+                switch(data) {
+                    case StatusCode.DOWNLOAD_FILE_ERROR:
+                        showToast(getI18nValue(context, "download_file_failed"));
+                        break;
+                    case StatusCode.LOAD_FILE_CONTENT_ERROR:
+                        showToast(getI18nValue(context, "load_file_content_failed"));
+                        break;
+                    case StatusCode.DECRYPT_ERROR:
+                        showToast(getI18nValue(context, "restore_failed_by_password"));
+                        break;
+                    default:
+                        showToast(getI18nValue(context, "restore_info_failed"));
                 }
+            } else {
+                showToast(getI18nValue(context, "restore_info_success"));
             }
             setState(() {
-                isShowLoading = false;
+                _isShowLoading = false;
             });
 
-            SetListenStoreStatusAction action = new SetListenStoreStatusAction(true);
+            SetListenStoreStatusAction action = SetListenStoreStatusAction(true);
             store.dispatch(action);
         });
     }
 
     void handleClickInfoItem(BuildContext context, Info info) {
         Navigator.of(context).push(
-            new MaterialPageRoute(
+            MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoShowView(info.id);
+                    return InfoShowView(info.id);
                 }
             )
         );
@@ -397,8 +385,14 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
         Navigator.of(context).pushNamed("categoryListView");
     }
 
+    bool isContainCategoryById(BuildContext context, String id) {
+        List<Category> categories = this.getAllCategories(context);
+
+        return categories.any((item) => item.id == id);
+    }
+
     List<Category> getAllCategories(BuildContext context) {
-        return this.getStore(context).state.categories;
+        return getStore(context).state.categories;
     }
 
     Store<AppState> getStore(BuildContext context) {

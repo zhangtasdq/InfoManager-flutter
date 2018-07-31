@@ -4,51 +4,51 @@ import "package:flutter_redux/flutter_redux.dart";
 import "package:flutter/services.dart";
 import "package:fluttertoast/fluttertoast.dart";
 
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/mixins/i18n_mixin.dart";
-import "package:info_manager/model/info.dart";
-import "package:info_manager/model/category.dart";
-import "package:info_manager/model/info_detail.dart";
-import "package:info_manager/views/info_edit.dart";
+import "../store/app_state.dart";
+import "../mixins/i18n_mixin.dart";
+import "../model/info.dart";
+import "../model/category.dart";
+import "../model/info_detail.dart";
+import "../views/info_edit.dart";
 
 class InfoShowView extends StatefulWidget {
-    String infoId;
+    String _infoId;
 
-    InfoShowView(this.infoId);
+    InfoShowView(this._infoId);
 
-    _InfoShowViewState createState() => new _InfoShowViewState(this.infoId);
+    _InfoShowViewState createState() => _InfoShowViewState(this._infoId);
 }
 
 class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
-    List<String> showDetailHideValue = [];
-    String infoId;
+    List<String> _showDetailHideValue = [];
+    String _infoId;
 
-    _InfoShowViewState(this.infoId);
+    _InfoShowViewState(this._infoId);
 
     @override
     Widget build(BuildContext context) {
         double appBarHeight = 100.0;
 
-        Info info = this.getCurrentInfo(context);
-        Category category = this.getCurrentCategory(context);
-        String titleName = info.title + " ( " + category.name + " )";
+        Info info = getCurrentInfo(context);
+        Category category = getCurrentCategory(context);
+        String titleName = "${info.title} (${category.name})";
 
-        return new Stack(
+        return Stack(
             children: <Widget>[
-                new Scaffold(
-                    appBar: new PreferredSize(
-                        preferredSize: new Size(MediaQuery.of(context).size.width, appBarHeight),
-                        child: new Container(
+                Scaffold(
+                    appBar: PreferredSize(
+                        preferredSize: Size(MediaQuery.of(context).size.width, appBarHeight),
+                        child: Container(
                             color: Colors.blue,
-                            child: new Container(
+                            child: Container(
                                 margin:const EdgeInsets.only(top: 30.0),
-                                child: new Column(children: <Widget>[
-                                    new Row(
+                                child: Column(children: <Widget>[
+                                    Row(
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                         children: <Widget>[
-                                            new Row(
+                                            Row(
                                                 children: <Widget>[
-                                                    new IconButton(
+                                                    IconButton(
                                                         icon: new Icon(
                                                             Icons.arrow_back,
                                                             color: Colors.white,
@@ -57,7 +57,7 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
                                                             Navigator.pop(context, false);
                                                         }
                                                     ),
-                                                    new Text(
+                                                    Text(
                                                         titleName,
                                                         style: new TextStyle(
                                                             fontSize: 20.0,
@@ -74,15 +74,15 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
                             )
                         )
                     ),
-                    body: new Center(
-                        child: this.buildInfoDetail(context, info),
+                    body: Center(
+                        child: buildInfoDetail(context, info),
                     ),
                 ),
-                new Positioned(
-                    child: new FloatingActionButton(
-                        child: new Icon(Icons.edit),
+                Positioned(
+                    child: FloatingActionButton(
+                        child: Icon(Icons.edit),
                         onPressed: () {
-                            this.handleTabEditInfo(context, info);
+                            handleTabEditInfo(context, info);
                         },
                         backgroundColor: Colors.lightBlue,
                     ),
@@ -94,47 +94,47 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
     }
 
     Widget buildInfoDetail(BuildContext context, Info info) {
-        if (info.getDetailCount() == 0) {
-            return new Center(
-                child: new Text(this.getI18nValue(context, "detail_is_empty")),
+        if (info.detailCount == 0) {
+            return Center(
+                child: Text(getI18nValue(context, "detail_is_empty")),
             );
         }
-        return new Container(
-            child: new ListView.builder(
-                itemCount: info.getDetailCount(),
+        return Container(
+            child: ListView.builder(
+                itemCount: info.detailCount,
                 itemBuilder: (BuildContext context, index) {
                     InfoDetail item = info.details[index];
 
-                    return this.buildInfoDetailItem(context, item);
+                    return buildInfoDetailItem(context, item);
                 }
             ),
         );
     }
 
     Widget buildInfoDetailItem(BuildContext context, InfoDetail item) {
-        return new Card(
-            child: new GestureDetector(
+        return Card(
+            child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTap: () {
-                    this.handleTabHideDetailItem(item);
+                    handleTabHideDetailItem(item);
                 },
-                onLongPress: () => this.handleLongPressOnDetailItem(item),
-                child: new Container(
+                onLongPress: () => handleLongPressOnDetailItem(item),
+                child: Container(
                     padding: EdgeInsets.only(top: 12.0, left: 12.0, bottom: 12.0),
-                    child: new Column(
+                    child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                            new Padding(
+                            Padding(
                                 padding: EdgeInsets.only(bottom: 12.0),
-                                child: new Text(
+                                child: Text(
                                     item.propertyName,
-                                    style: new TextStyle(
+                                    style: TextStyle(
                                         fontSize: 18.0,
                                         fontWeight: FontWeight.bold
                                     ),
                                 ),
                             ),
-                            new Text(this.getDetailItemValue(item))
+                            Text(getDetailItemValue(item))
                         ],
                     ),
                 ),
@@ -147,7 +147,7 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
             return item.propertyValue;
         }
 
-        if (this.showDetailHideValue.contains(item.id)) {
+        if (_showDetailHideValue.contains(item.id)) {
             return item.propertyValue;
         }
 
@@ -155,28 +155,18 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
     }
 
     Category getCurrentCategory(BuildContext context) {
-        Store<AppState> store = this.getStore(context);
+        Store<AppState> store = getStore(context);
         List<Category> categories = store.state.categories;
-        Info info = this.getCurrentInfo(context);
-
-        for (int i = 0, j = categories.length; i < j; ++i) {
-            if (categories[i].id == info.categoryId) {
-                return categories[i];
-            }
-        }
-        return null;
+        Info info = getCurrentInfo(context);
+        
+        return categories.firstWhere((item) => item.id == info.categoryId, orElse: () => null);
     }
 
     Info getCurrentInfo(BuildContext context) {
         Store<AppState> store = this.getStore(context);
         List<Info> infos = store.state.infos;
 
-        for (int i = 0, j = infos.length; i < j; ++i) {
-            if (infos[i].id == this.infoId) {
-                return infos[i];
-            }
-        }
-        return null;
+        return infos.firstWhere((item) => item.id == _infoId, orElse: () => null);
     }
 
     Store<AppState> getStore(BuildContext context) {
@@ -184,29 +174,29 @@ class _InfoShowViewState extends State<InfoShowView> with I18nMixin {
     }
 
     void handleTabHideDetailItem(InfoDetail detail) {
-        if (this.showDetailHideValue.contains(detail.id)) {
+        if (_showDetailHideValue.contains(detail.id)) {
             setState(() {
-                this.showDetailHideValue.remove(detail.id);
+                _showDetailHideValue.remove(detail.id);
             });
         } else {
             setState(() {
-                this.showDetailHideValue.add(detail.id);
+                _showDetailHideValue.add(detail.id);
             });
         }
     }
 
     void handleLongPressOnDetailItem(InfoDetail detail) {
-        Clipboard.setData(new ClipboardData(text: detail.propertyValue));
+        Clipboard.setData(ClipboardData(text: detail.propertyValue));
         Fluttertoast.showToast(
-            msg: this.getI18nValue(context, "already_copied_to_clipboard")
+            msg: getI18nValue(context, "already_copied_to_clipboard")
         );
     }
 
     void handleTabEditInfo(BuildContext context, Info info) {
         Navigator.of(context).push(
-            new MaterialPageRoute(
+            MaterialPageRoute(
                 builder: (BuildContext context) {
-                    return new InfoEditView("edit", info.id);
+                    return InfoEditView("edit", info.id);
                 }
             )
         );

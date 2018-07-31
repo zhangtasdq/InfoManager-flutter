@@ -1,7 +1,7 @@
 import "package:redux/redux.dart";
 
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/model/user_info.dart";
+import "../store/app_actions.dart";
+import "../model/user_info.dart";
 
 final userInfoReducer = combineReducers<UserInfo>([
     new TypedReducer<UserInfo, SetPasswordAction>(_setPassword),

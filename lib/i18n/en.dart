@@ -58,5 +58,10 @@ const Map<String, String> EN = {
     "fingerprint_auth_success": "Fingerprint auth success",
     "already_copied_to_clipboard": "Already copied to clipboard",
     "system_error": "System error",
-    "confirm_enable_fingerprint_msg": "if enable fingerprint, will save your password in local, may cause securitty problems, is enable?"
+    "confirm_enable_fingerprint_msg": "if enable fingerprint, will save your password in local, may cause securitty problems, is enable?",
+    "fingerprint_system_error": "fingerprint error, please try password",
+    "restore_failed_by_password": "password is error, restore failed",
+    "load_file_content_failed": "Load file content failed",
+    "download_file_error": "Download file failed",
+    "load_data_error": "Load data failed"
 };

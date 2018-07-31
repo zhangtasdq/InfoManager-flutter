@@ -5,40 +5,38 @@ import "package:flutter/rendering.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
-import "package:info_manager/store/app_actions.dart";
-import "package:info_manager/store/app_state.dart";
-import "package:info_manager/store/app_reducer.dart";
-
-import "package:info_manager/i18n/info_manager_localizations.dart" show InfoManagerLocalizationsDelegate;
-import "package:info_manager/service/app_service.dart";
-
-import "package:info_manager/views/login.dart";
-import "package:info_manager/views/info_list.dart";
-import "package:info_manager/views/setting.dart";
-import "package:info_manager/views/category_list.dart";
+import "./store/app_actions.dart";
+import "./store/app_state.dart";
+import "./store/app_reducer.dart";
+import "./i18n/info_manager_localizations.dart" show InfoManagerLocalizationsDelegate;
+import "./service/app_service.dart";
+import "./views/login.dart";
+import "./views/info_list.dart";
+import "./views/setting.dart";
+import "./views/category_list.dart";
 
 void main() {
-    runApp(new InfoManager());
+    runApp(InfoManager());
 }
 
 class InfoManager extends StatefulWidget {
     @override
-    _InfoManagerState createState() => new _InfoManagerState();
+    _InfoManagerState createState() => _InfoManagerState();
 }
 
 class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
-    bool previousInitState = false;
-    Store<AppState> store;
-    BuildContext appContext;
+    bool _previousInitState = false;
+    Store<AppState> _store;
+    BuildContext _appContext;
 
     @override
     void initState() {
         super.initState();
-        store = new Store<AppState>(
+        _store = Store<AppState>(
             appReducer,
             initialState: new AppState(),
         );
-        store.onChange.listen(this.handleStateChange);
+        _store.onChange.listen(handleStateChange);
         WidgetsBinding.instance.addObserver(this);
     }
 
@@ -51,24 +49,24 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
     @override
     void didChangeAppLifecycleState(AppLifecycleState state) {
         if (state == AppLifecycleState.paused) {
-            this.handleAppPause();
+            handleAppPause();
         }
     }
 
 
     @override
     Widget build(BuildContext context) {
-        return new StoreProvider(
-            store: store,
-            child: new MaterialApp(
+        return StoreProvider(
+            store: _store,
+            child: MaterialApp(
                 title: "InfoManager",
-                theme: new ThemeData(
+                theme: ThemeData(
                     primaryColor: Colors.blue
                 ),
                 home: Builder(
                     builder: (context) {
-                        this.appContext = context;
-                        return new LoginView();
+                        _appContext = context;
+                        return LoginView();
                     }
                 ),
                 localizationsDelegates: [
@@ -81,28 +79,28 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
                     const Locale("zh", "")
                 ],
                 routes: {
-                    "loginView": (BuildContext context) => new LoginView(),
+                    "loginView": (BuildContext context) => LoginView(),
                     "infoListView": (BuildContext context) {
-                        this.appContext = context;
-                        return new InfoListView();
+                        _appContext = context;
+                        return InfoListView();
                     },
-                    "settingView": (BuildContext context) => new SettingView(),
-                    "categoryListView": (BuildContext context) => new CategoryListView()
+                    "settingView": (BuildContext context) => SettingView(),
+                    "categoryListView": (BuildContext context) => CategoryListView()
                 },
             )
         );
     }
 
     void handleStateChange(AppState state) async {
-        if (this.shouldSaveAppState(state)) {
+        if (shouldSaveAppState(state)) {
             await AppService.saveAppStateData(state);
         }
     }
 
     void handleAppPause() {
-        ResetAppAction action = new ResetAppAction();
-        this.store.dispatch(action);
-        Navigator.of(this.appContext).pushNamedAndRemoveUntil("loginView", (Route<dynamic> route) => false);
+        ResetAppAction action = ResetAppAction();
+        _store.dispatch(action);
+        Navigator.of(_appContext).pushNamedAndRemoveUntil("loginView", (Route<dynamic> route) => false);
     }
 
     bool shouldSaveAppState(AppState state) {
@@ -110,8 +108,8 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
             return false;
         }
 
-        if (!previousInitState) {
-            previousInitState = true;
+        if (!_previousInitState) {
+            _previousInitState = true;
             return false;
         }
         return true;

@@ -1,8 +1,9 @@
 import "dart:io";
 import "dart:async";
+
 import "package:path_provider/path_provider.dart";
 
-import "package:info_manager/configure/app_configure.dart";
+import "../configure/app_configure.dart";
 
 class FileService {
     static Future<File> _getLocalFile() async {
@@ -24,10 +25,10 @@ class FileService {
         return file.readAsString();
     }
 
-    static Future<Null> saveFileContent(String content) async {
+    static Future<File> saveFileContent(String content) async {
         File file = await _getLocalFile();
 
-        await file.writeAsString(content);
+        return file.writeAsString(content);
     }
 
     static Future<File> deleteFile() async {

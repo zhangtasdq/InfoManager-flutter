@@ -226,7 +226,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
 
         try {
             bool didAuthenticate = await localAuth.authenticateWithBiometrics(
-                localizedReason: this.getI18nValue(context, "please_auth_fingerprint"),
+                localizedReason: getI18nValue(context, "please_auth_fingerprint"),
                 androidAuthStrings: androidStrings,
                 useErrorDialogs: false
             );
@@ -238,11 +238,8 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
                 await handlePasswordError();
             }
         } catch(e) {
-            Fluttertoast.showToast(
-                msg: getI18nValue(context, "fingerprint_system_error")
-            );
+            showToast(getI18nValue(context, "fingerprint_system_error"));
         }
-
     }
 
     Future<Null> handlePasswordError() async {
@@ -251,14 +248,10 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
         }
 
         if (_inputErrorCount == getErrorPasswordMaxCount(context)) {
-            Fluttertoast.showToast(
-                msg: getI18nValue(context, "input_password_error_more_than_max_count")
-            );
+            showToast(getI18nValue(context, "input_password_error_more_than_max_count"));
             await AppService.deleteFile();
         } else {
-            Fluttertoast.showToast(
-                msg: getI18nValue(context, "password_is_error")
-            );
+            showToast(getI18nValue(context, "password_is_error"));
         }
 
         return null;
@@ -274,12 +267,12 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
 
         AppService.loadAppStateData(store, (error, {dynamic data}) {
             if (error != null) {
-                this.showToast(getI18nValue(context, "load_data_error"));
+                showToast(getI18nValue(context, "load_data_error"));
             } else {
                 new Future.delayed(Duration(milliseconds: 100), () {
                     store.dispatch(SetListenStoreStatusAction(true));
+                    Navigator.pushReplacementNamed(context, "infoListView");
                 });
-                Navigator.pushReplacementNamed(context, "infoListView");
             }
         });
     }

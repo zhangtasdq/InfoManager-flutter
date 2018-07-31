@@ -16,7 +16,6 @@ class UserService {
             } catch (e) {
                 return false;
             }
-
         }
         return true;
     }

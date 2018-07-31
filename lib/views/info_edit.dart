@@ -363,7 +363,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
             }
             store.dispatch(action);
 
-            Future.delayed(Duration(milliseconds: 1200), () {
+            Future.delayed(Duration(milliseconds: 1000), () {
                 Navigator.pop(context);
             });
         }
@@ -400,7 +400,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
         store.dispatch(action);
 
-        Future.delayed(Duration(milliseconds: 1000), () {
+        Future.delayed(Duration(milliseconds: 500), () {
             Navigator.of(context).pushNamedAndRemoveUntil("infoListView", (Route<dynamic> route) => false);
         });
     }

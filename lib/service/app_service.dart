@@ -135,24 +135,35 @@ class AppService {
     static restoreInfo(Store<AppState> store, AsyncCallback callback) async {
         String fileName = APP_CONFIGURE["INFO_FILE_NAME"];
 
-        CloudStoreService.downloadFile(fileName, (downloadError, {dynamic data}) async {
-            if (downloadError != null) {
-                callback(downloadError, data: StatusCode.DOWNLOAD_FILE_ERROR);
+        CloudStoreService.isFileExists(fileName, (checkError, {dynamic data}) {
+            if (checkError != null) {
+                callback(checkError, data: StatusCode.CHECK_REMOTE_FILE_EXIST_ERROR);
             } else {
-                if (data != null) {
-                    await FileService.saveFileContent(data);
-                    loadAppStateData(store, (error, {dynamic data}) {
-                        if (error != null) {
-                            callback(error, data: data);
+                if (data) {
+                    CloudStoreService.downloadFile(fileName, (downloadError, {dynamic data}) async {
+                        if (downloadError != null) {
+                            callback(downloadError, data: StatusCode.DOWNLOAD_FILE_ERROR);
                         } else {
-                            callback(null, data: StatusCode.RESTORE_SUCCESS);
+                            if (data != null) {
+                                await FileService.saveFileContent(data);
+                                loadAppStateData(store, (error, {dynamic data}) {
+                                    if (error != null) {
+                                        callback(error, data: data);
+                                    } else {
+                                        callback(null, data: StatusCode.RESTORE_SUCCESS);
+                                    }
+                                });
+                            } else {
+                                callback(null, data: StatusCode.RESTORE_SUCCESS);
+                            }
                         }
+
                     });
                 } else {
                     callback(null, data: StatusCode.RESTORE_SUCCESS);
                 }
             }
-
         });
+
     }
 }

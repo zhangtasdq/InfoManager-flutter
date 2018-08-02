@@ -11,5 +11,6 @@ const Map<String, dynamic> APP_CONFIGURE = {
     "HARDWARE_CHANNEL_NAME": "cqmyg.asdq.infomanager.hardware",
     "AD_MOB_APP_ID": "",
     "AD_MOB_AD_ID": "",
-    "AD_DEVICE_ID": ""
+    "AD_DEVICE_ID": "",
+    "IS_ENABLE_AD": true
 };

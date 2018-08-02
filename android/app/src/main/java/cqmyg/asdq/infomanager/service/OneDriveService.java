@@ -22,6 +22,11 @@ import java.io.InputStream;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 public class OneDriveService {
+    private static final String SERVICE_NAME = "OneDriveService";
+    private static final String IS_FILE_EXIST_ERROR = "IS_FILE_EXIST_ERROR";
+    private static final String SAVE_FILE_ERROR = "SAVE_FILE_ERROR";
+    private static final String DOWNLOAD_FILE_ERROR = "DOWNLOAD_FILE_ERROR";
+
     private IOneDriveClient oneDriveClient = null;
 
     private IClientConfig createConfig(final String clientId, final String[] scope) {
@@ -43,7 +48,7 @@ public class OneDriveService {
         return config;
     }
 
-       private void getOneDriveClient(String clientId, String[] scopes, Activity activity, final ICallback<Void> callback) {
+    private void getOneDriveClient(String clientId, String[] scopes, Activity activity, final ICallback<Void> callback) {
         if (this.oneDriveClient == null) {
             final ICallback<IOneDriveClient> authCallback = new ICallback<IOneDriveClient>() {
                 @Override
@@ -57,11 +62,11 @@ public class OneDriveService {
                     callback.failure(ex);
                 }
             };
-
             new OneDriveClient.
                     Builder().
                     fromConfig(this.createConfig(clientId, scopes)).
                     loginAndBuildClient(activity, authCallback);
+
         } else {
             callback.success(null);
         }
@@ -74,28 +79,29 @@ public class OneDriveService {
             public void success(Void aVoid) {
                 IOneDriveClient client = OneDriveService.this.oneDriveClient;
 
+
                 client.getDrive().
-                    getSpecial("approot").
-                    getSearch(fileName).
-                    buildRequest().
-                    get(new ICallback<ISearchCollectionPage>() {
-                        @Override
-                        public void success(ISearchCollectionPage iSearchCollectionPage) {
-                            boolean isFileExists = !iSearchCollectionPage.getCurrentPage().isEmpty();
+                        getSpecial("approot").
+                        getSearch(fileName).
+                        buildRequest().
+                        get(new ICallback<ISearchCollectionPage>() {
+                            @Override
+                            public void success(ISearchCollectionPage iSearchCollectionPage) {
+                                boolean isFileExists = !iSearchCollectionPage.getCurrentPage().isEmpty();
 
-                            callback.success(isFileExists);
-                        }
+                                callback.success(isFileExists);
+                            }
 
-                        @Override
-                        public void failure(ClientException ex) {
-                            callback.error("OneDriveError", "get file error", ex);
-                            ex.printStackTrace();
-                        }
-                    });
+                            @Override
+                            public void failure(ClientException ex) {
+                                callback.error(SERVICE_NAME,IS_FILE_EXIST_ERROR, ex.getMessage());
+                                ex.printStackTrace();
+                            }
+                        });
             }
             @Override
             public void failure(ClientException ex) {
-                callback.error("OneDriveError", "auth error", ex);
+                callback.error(SERVICE_NAME, IS_FILE_EXIST_ERROR, ex.getMessage());
                 ex.printStackTrace();
             }
         });
@@ -115,7 +121,7 @@ public class OneDriveService {
 
             @Override
             public void failure(ClientException ex) {
-                callback.error("OneDriveError", ex.getMessage(), ex);
+                callback.error(SERVICE_NAME, SAVE_FILE_ERROR, ex.getMessage());
                 ex.printStackTrace();
             }
         };
@@ -137,10 +143,12 @@ public class OneDriveService {
 
             @Override
             public void failure(ClientException ex) {
-                callback.error("OneDriveError", ex.getMessage(), ex);
+                callback.error(SERVICE_NAME, SAVE_FILE_ERROR, ex.getMessage());
                 ex.printStackTrace();
             }
         });
+
+
     }
 
     public void downloadFile(final String fileName, String clientId, String[] oneDriveScope,
@@ -155,10 +163,11 @@ public class OneDriveService {
 
             @Override
             public void failure(ClientException ex) {
-                callback.error("OneDriveError", ex.getMessage(), ex);
+                callback.error(SERVICE_NAME, DOWNLOAD_FILE_ERROR, ex.getMessage());
                 ex.printStackTrace();
             }
         });
+
     }
 
     private static class DownloadTask extends AsyncTask<Void, Void, Void> {
@@ -197,7 +206,7 @@ public class OneDriveService {
                 String data = byteArrayOutputStream.toString();
                 callback.success(data);
             } catch (IOException e) {
-                callback.error("OneDriveError", e.getMessage(), e);
+                callback.error(SERVICE_NAME, DOWNLOAD_FILE_ERROR, e.getMessage());
                 e.printStackTrace();
             }
             return null;

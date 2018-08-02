@@ -37,7 +37,7 @@ class _SelectListState extends State<CategorySelectList> {
     }
 
     List<Widget> buildSelectItems(BuildContext context, List<Category> categories) {
-        return categories.map((category) => buildSelectItem(context, category));
+        return categories.map((category) => buildSelectItem(context, category)).toList();
     }
 
     Widget buildSelectItem(BuildContext context, dynamic item) {

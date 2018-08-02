@@ -57,7 +57,7 @@ class Info {
     }
 
     void setTitle(String title) {
-        title = title;
+        this.title = title;
     }
 
     @override

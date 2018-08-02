@@ -3,7 +3,6 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
-import "package:fluttertoast/fluttertoast.dart";
 import "package:local_auth/local_auth.dart";
 import "package:local_auth/auth_strings.dart";
 import "package:firebase_admob/firebase_admob.dart";
@@ -31,10 +30,9 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
     bool _isEnableFingerPrintUnlock = false;
     bool _isEnableDeleteFile = false;
     BannerAd _bannerAd;
-    bool _isEnableAd = true;
 
     static final MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
-        testDevices: <String>[APP_CONFIGURE["AD_DEVICE_ID"]]
+        testDevices: APP_CONFIGURE["AD_DEVICE_ID"].isEmpty ? [] : <String>[APP_CONFIGURE["AD_DEVICE_ID"]]
     );
 
     BannerAd createBannerAd() {
@@ -60,11 +58,11 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
             });
         });
 
-        if (_isEnableAd) {
+        if (APP_CONFIGURE["IS_ENABLE_AD"]) {
             FirebaseAdMob.instance.initialize(appId: APP_CONFIGURE["AD_MOB_APP_ID"]);
             _bannerAd = createBannerAd()..load()..show(
                 anchorType: AnchorType.bottom,
-                anchorOffset: 0.0
+                anchorOffset: 0.0,
             );
         }
     }
@@ -86,7 +84,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
 
     @override
     void dispose() {
-        _bannerAd?.dispose();
+        clearAd();
         super.dispose();
     }
 
@@ -127,6 +125,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
                     children: <Widget>[
                         TextFormField(
                             obscureText: true,
+                            autofocus: true,
                             decoration: InputDecoration(
                                 labelText: getI18nValue(context, "password"),
                                 hintText: getI18nValue(context, "please_input_password"),
@@ -140,7 +139,6 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
                             onSaved: (value) {
                                 _currentPassword = value;
                             },
-
                         ),
                         Container(
                             margin: EdgeInsets.only(top: 50.0),
@@ -271,10 +269,16 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
             } else {
                 new Future.delayed(Duration(milliseconds: 100), () {
                     store.dispatch(SetListenStoreStatusAction(true));
+                    clearAd();
                     Navigator.pushReplacementNamed(context, "infoListView");
                 });
             }
         });
+    }
+
+    void clearAd() {
+        _bannerAd?.dispose();
+        _bannerAd = null;
     }
 
     int getErrorPasswordMaxCount(BuildContext context) {

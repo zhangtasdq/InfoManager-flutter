@@ -3,12 +3,12 @@ import "dart:async";
 import "package:flutter/material.dart";
 import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
-import "package:fluttertoast/fluttertoast.dart";
 
 import "../store/app_state.dart";
 import "../store/app_actions.dart";
 import "../util/uid.dart";
 import "../mixins/i18n_mixin.dart";
+import "../mixins/msg_mixin.dart";
 import "../model/info.dart";
 import "../model/category.dart";
 import "../model/info_detail.dart";
@@ -25,7 +25,7 @@ class InfoEditView extends StatefulWidget {
     _InfoEditViewState createState() => _InfoEditViewState(this._viewAction, this._editInfoId);
 }
 
-class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
+class _InfoEditViewState extends State<InfoEditView> with I18nMixin, MsgMixin {
     bool _isInit = false;
     String _viewAction;
     String _editInfoId;
@@ -193,7 +193,6 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
                                         item.setPropertyName(value);
                                     },
                                     initialValue: item.propertyName,
-
                                 ),
 
                                 Row(
@@ -345,9 +344,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin {
 
     void handleClickSave(BuildContext context) {
         if (_currentInfo.categoryId.isEmpty) {
-            Fluttertoast.showToast(
-                msg: getI18nValue(context, "category_can_not_empty")
-            );
+            showToast(getI18nValue(context, "category_can_not_empty"));
             return;
         }
         if (_formKey.currentState.validate()) {

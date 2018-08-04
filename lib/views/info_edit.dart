@@ -164,6 +164,7 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin, MsgMixin {
         InfoDetail item = _currentInfo.findDetailByIndex(detailIndex);
 
         return Card(
+            key: Key(item.id),
             child: Container(
                 padding: EdgeInsets.only(left: 10.0, right: 10.0, bottom: 10.0),
                 child: Stack(children: <Widget>[
@@ -241,10 +242,11 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin, MsgMixin {
             child: RaisedButton(
                 onPressed: handleClickAddDetailItem,
                 padding: EdgeInsets.symmetric(vertical: 10.0),
+                color: Colors.blue,
                 child: Icon(
                     Icons.add,
                     size: 30.0,
-                    color: Colors.blue,
+                    color: Colors.white,
                 ),
             )
         );

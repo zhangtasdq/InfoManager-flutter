@@ -63,5 +63,6 @@ const Map<String, String> ZH = {
     "restore_failed_by_password": "密码不正确,还原失败",
     "load_file_content_failed": "加载文件内容失败，请稍候重试",
     "download_file_error": "下载文件，请稍候重试",
-    "load_data_error": "加载数据失败，请稍候重试"
+    "load_data_error": "加载数据失败，请稍候重试",
+    "category_not_empty_can_not_delete": "分类不为空，不能删除"
 };

@@ -78,6 +78,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                                 Info item = infos[i];
 
                                 return Container(
+                                    key: Key(item.id),
                                     child: Column(
                                         children: <Widget>[
                                             ListTile(
@@ -179,6 +180,7 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
         }
 
         children.add(Container(
+            key: Key(category.id),
             color: isChecked ? Colors.lightBlue : Colors.white,
             padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10.0),
             child: Text(

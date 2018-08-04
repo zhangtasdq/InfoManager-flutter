@@ -63,5 +63,7 @@ const Map<String, String> EN = {
     "restore_failed_by_password": "password is error, restore failed",
     "load_file_content_failed": "Load file content failed, Please try again later",
     "download_file_error": "Download file failed, Please try again later",
-    "load_data_error": "Load data failed, Please try again later"
+    "load_data_error": "Load data failed, Please try again later",
+    "category_not_empty_can_not_delete": "Category is not empty, cannot be deleted"
+
 };

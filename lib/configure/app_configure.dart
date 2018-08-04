@@ -12,5 +12,5 @@ const Map<String, dynamic> APP_CONFIGURE = {
     "AD_MOB_APP_ID": "",
     "AD_MOB_AD_ID": "",
     "AD_DEVICE_ID": "",
-    "IS_ENABLE_AD": true
+    "IS_ENABLE_AD": false
 };

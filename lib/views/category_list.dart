@@ -3,6 +3,7 @@ import "package:redux/redux.dart";
 import "package:flutter_redux/flutter_redux.dart";
 
 import "../model/category.dart";
+import "../model/info.dart";
 import "../store/app_state.dart";
 import "../store/app_actions.dart";
 import "../mixins/i18n_mixin.dart";
@@ -49,6 +50,7 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
                         Category item = categories[i];
 
                         return Container(
+                            key: Key(item.id),
                             child: Column(
                                 children: <Widget>[
                                     ListTile(
@@ -86,34 +88,46 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
     void handleDeleteCategory(BuildContext context, Category category) {
         BuildContext topContext = context;
 
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-                return AlertDialog(
-                    title: Text(getI18nValue(context, "delete_category")),
-                    content: Text(getI18nValue(context, "confirm_delete_category")),
-                    actions: <Widget>[
-                        RaisedButton(
-                            child: Text(getI18nValue(context, "cancel")),
-                            onPressed: () => Navigator.of(context).pop()
-                        ),
-                        RaisedButton(
-                            child: Text(getI18nValue(context, "confirm")),
-                            onPressed: () {
-                                Navigator.of(context).pop();
-                                executeDeleteCategory(topContext, category);
-                            }
-                        )
-                    ],
-                );
-            }
-        );
+        if (isAllowDeleteCategory(context, category)) {
+            showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                    return AlertDialog(
+                        title: Text(getI18nValue(context, "delete_category")),
+                        content: Text(getI18nValue(context, "confirm_delete_category")),
+                        actions: <Widget>[
+                            RaisedButton(
+                                child: Text(getI18nValue(context, "cancel")),
+                                onPressed: () => Navigator.of(context).pop()
+                            ),
+                            RaisedButton(
+                                child: Text(getI18nValue(context, "confirm")),
+                                onPressed: () {
+                                    Navigator.of(context).pop();
+                                    executeDeleteCategory(topContext, category);
+                                }
+                            )
+                        ],
+                    );
+                }
+            );
+        } else {
+            showToast(getI18nValue(context, "category_not_empty_can_not_delete"));
+        }
+
     }
 
     void executeDeleteCategory(BuildContext context, Category category) {
         Store<AppState> store = getStore(context);
         DeleteCategoryAction action = DeleteCategoryAction(category);
         store.dispatch(action);
+    }
+
+    bool isAllowDeleteCategory(BuildContext context, Category category) {
+        Store<AppState> store = getStore(context);
+        List<Info> infos = store.state.infos;
+
+        return !infos.any((item) => item.categoryId == category.id);
     }
 
 

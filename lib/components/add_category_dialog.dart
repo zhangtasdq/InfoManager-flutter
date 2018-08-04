@@ -23,6 +23,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> with I18nMixin {
             content: Form(
                 key: _formKey,
                 child: TextFormField(
+                    autofocus: true,
                     decoration: InputDecoration(
                         labelText: getI18nValue(context, "category_name"),
                         hintText: getI18nValue(context, "please_input_category_name")

@@ -71,7 +71,7 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
     Widget build(BuildContext context) {
         return Container(
             color: Colors.white,
-            padding: EdgeInsets.only(top: 150.0, right: 32.0, left: 32.0),
+            padding: EdgeInsets.only(top: 150.0, right: 16.0, left: 16.0),
             height: 300.0,
             child: Column(
                 mainAxisSize: MainAxisSize.min,

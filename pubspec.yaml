@@ -9,7 +9,7 @@ dependencies:
     sdk: flutter
   flutter_redux: ^0.5.2
   path_provider: ^0.4.1
-  flutter_string_encryption: ^0.0.2
+  flutter_string_encryption: ^0.2.0
   fluttertoast: ^2.0.6
   shared_preferences: ^0.4.2
   local_auth: 0.2.1

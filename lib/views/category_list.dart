@@ -114,7 +114,6 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
         } else {
             showToast(getI18nValue(context, "category_not_empty_can_not_delete"));
         }
-
     }
 
     void executeDeleteCategory(BuildContext context, Category category) {
@@ -129,7 +128,6 @@ class _CategoryListViewState extends State<CategoryListView> with I18nMixin, Msg
 
         return !infos.any((item) => item.categoryId == category.id);
     }
-
 
     Store<AppState> getStore(BuildContext context) {
         return StoreProvider.of<AppState>(context);

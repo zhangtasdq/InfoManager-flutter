@@ -168,7 +168,6 @@ class _InfoListViewState extends State<InfoListView> with I18nMixin, MsgMixin {
                 );
             },
         );
-
     }
 
     Widget buildCategoryDrawerLayoutItem(BuildContext context, Category category, int index) {

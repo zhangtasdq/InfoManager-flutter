@@ -53,7 +53,6 @@ class _InfoManagerState extends State<InfoManager> with WidgetsBindingObserver {
         }
     }
 
-
     @override
     Widget build(BuildContext context) {
         return StoreProvider(

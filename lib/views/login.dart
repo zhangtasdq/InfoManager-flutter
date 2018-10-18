@@ -195,7 +195,6 @@ class _LoginViewState extends State<LoginView> with I18nMixin, MsgMixin {
         );
     }
 
-
     void _handleLogin(BuildContext context, SetPasswordActionType updatePasswordAction) async {
         if (_formKey.currentState.validate()) {
             _formKey.currentState.save();

@@ -257,7 +257,6 @@ class _InfoEditViewState extends State<InfoEditView> with I18nMixin, MsgMixin {
             return getI18nValue(context, "edit_info");
         }
         return getI18nValue(context, "create_info");
-
     }
 
     bool isEdit() {

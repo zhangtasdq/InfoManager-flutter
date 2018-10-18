@@ -53,7 +53,6 @@ class AppService {
         }
     }
 
-
     static void loadAppInfos(List<dynamic> infos, Store<AppState> store) {
         List<Info> datas = [];
 
@@ -86,7 +85,6 @@ class AppService {
         SetUserInfoAction action = SetUserInfoAction(UserInfo.fromJson(userInfo));
 
         store.dispatch(action);
-
     }
 
     static Future<void> deleteFile() async {
@@ -164,6 +162,5 @@ class AppService {
                 }
             }
         });
-
     }
 }

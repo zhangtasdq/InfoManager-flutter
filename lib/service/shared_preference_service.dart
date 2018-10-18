@@ -51,7 +51,6 @@ class SharedPreferenceService {
         SharedPreferences sharedPreferences = await getInstance();
 
         return sharedPreferences.setBool(APP_CONFIGURE["IS_ENABLE_DELETE_FILE_KEY"], isEnable);
-
     }
 
     static Future<bool> setIsEnableFingerPrintUnlock(bool isEnable) async {

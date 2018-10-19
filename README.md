@@ -6,7 +6,13 @@ InfoManger
 
 截图
 ---
+<img src="./screenshot/login.png" width="240" />
+<img src="./screenshot/list.png" width="240" />
+<img src="./screenshot/detail.png" width="240" />
+<img src="./screenshot/edit.png" width="240" />
 
+演示
+---
 ![InfoManager](./screenshot/infomanager.gif)
 
 GooglePlay

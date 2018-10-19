@@ -11,7 +11,6 @@ InfoManger
 <img src="./screenshot/detail.png" width="240" />
 <img src="./screenshot/edit.png" width="240" />
 
-
 演示
 ---
 ![InfoManager](./screenshot/infomanager.gif)
